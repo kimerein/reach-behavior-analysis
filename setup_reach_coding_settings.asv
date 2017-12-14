@@ -15,8 +15,7 @@ settings.save=1; % 1 if want to save zones data to movie directory, 0 otherwise
 % Note that the location of these zones should not change during the movie
 settings.zones(1).name='perch zone'; % zone name
 settings.zones(1).prompt='Draw a polygon enclosing the perch zone on the image.'; % describe zone to user
-settings.zones(1).analysisField='perchZone'; % refers to field for automated movie analysis from readIntensityValues.m on
-% see ____ for explanation of how different fields are used
+settings.zones(1).analysisField=
 settings.zones(1).takeImageValue='intensity'; % which value to get from this zone in movie
 % takeImageValue can be one of the following:
 % 'intensity' : get intensity from movie pixels
