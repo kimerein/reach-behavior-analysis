@@ -57,10 +57,9 @@ fig=implay(allframes,30);
 fig.Parent.Position=[100 100 800 800];
 pause;
 if contains(version,'2017b')
-    currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
+    
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
-end
 
 % Instructions to user
 continuebutton=questdlg(settings.prompt2,'Instructions 1','Yes','Cancel','Cancel');
