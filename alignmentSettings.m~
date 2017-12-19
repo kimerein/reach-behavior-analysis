@@ -1,0 +1,97 @@
+function settings=alignmentSettings()
+
+% Settings for getAlignment.m
+% Note that microSD (Arduino) output is timed in ms
+% Whereas video is timed in frames per sec
+
+% Need to resample movie and arduino data so that indices represent
+% matching times
+settings.arduino_fs=1000; % arduino data sampling rate in Hz
+settings.movie_fs=30; % movie data sampling rate in Hz
+settings.scale_factor=floor(settings.arduino_fs/settings.movie_fs);
+
+% Choose the following two numbers based on approximate relationship between
+% sampling rate of arduino data and sampling rate of movie data.
+% For example, if movie rate is 30 frames per second and arduino data is
+% timed in ms, 1000 ms/30 ms = 33 ... scale factor is 33.
+settings.arduino_dec=settings.scale_factor;
+settings.movie_dec=1;
+
+% The following values help the alignment by giving an estimate of when
+% the movie fits into the arduino data.
+% If isInSecondHalf is 0, the code will start looking for an appropriate
+% alignment of the movie data at the beginning of the arduino data.
+% If, in fact, the movie comes in the second half of the arduino data
+% stream, indicate this by setting isInSecondHalf to 1.
+settings.isInSecondHalf=1; % set this to 1 if movie matches a later section of arduino data stream
+
+% For fractionThroughArduino ...
+% Where in the arduino data stream does the movie begin? 
+% If isInSecondHalf is 1, we will discard the first nth of the arduino data
+% stream before looking for an alignment with the movie, where n is
+% fractionThroughArduino.
+% This helps code find the correct alignment.
+% For example, if the movie begins 75% of the way through the arduino data
+% stream, set fractionThroughArduino to 3/4.
+settings.fractionThroughArduino=3/4; 
+
+% The code will try different scalings of the movie data onto the arduino
+% data. An initial guess at the correct scaling will be chosen based on a
+% preliminary alignment. The code will then try to further refine this
+% estimate (called guess_best_scale) by trying different scalings similar 
+% to this best guess. The code will try all scalings between
+% tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
+settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
+settings.try_scale1=0;
+settings.try_scale2=0.05; 
+% If the preliminary alignment seems to produce an under-scaling of movie
+% data with respect to arduino data, increase try_scale1 and try_scale2.
+% If the preliminary alignment seems to produce an over-scaling of movie
+% data with respect to arduino data, decrease try_scale1 and try_scale2.
+
+% Similarly, the code will try different delays of the movie data with
+% respect to the arduino data. An initial guess at the correct delay is
+% chosen based on a preliminary alignment. The code will then try to
+% further refine this estimate (called guess_best_delay) by trying
+% different delays similar to this best guess. The code will try all delays
+% between
+% trydelays=guess_best_delay+try_delay1:guess_best_delay+try_delay2;
+settings.try_delay1=-200;
+settings.try_delay2=200;
+
+% The movie DVR occasionally skips. For final alignment, code will subtly 
+% shift sub-sections of movie data to better match arduino data 
+settings.alignSegments=600; % how many indices in each sub-section to independently align
+% For more precise local alignment, decrease alignSegments. For more
+% precise global alignment, increase alignSegments.
+
+% Data to align
+% These data types are from arduino
+aligned.cue % from arduino
+aligned.falseCueOn % from arduino
+aligned.testRunDistractor % from arduino
+aligned.pelletLoaded % from arduino
+aligned.pelletPresented % from arduino
+aligned.encoder % from arduino
+aligned.drops % from arduino
+aligned.misses % from arduino
+% These data types are from movie
+aligned.testRunDistractor_movie
+
+
+settings.beginTrialWrite=0;
+settings.loaderWriteCode=1;
+settings.pelletsWriteCode=2;
+settings.optoWriteCode=3;
+settings.cueWriteCode=4;
+settings.distractorWriteCode=5;
+settings.interlockWriteCode=6;
+
+settings.dropWriteCode=1000; % unused
+settings.missWriteCode=1000; % unused
+settings.encoderWriteCode=1000; % unused
+
+
+
+
+end

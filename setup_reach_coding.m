@@ -40,6 +40,7 @@ if discardFirstNFrames>0
     end
 end
 
+n=settings.framesPerChunk;
 for i=1:settings.framesPerChunk % How many frames to read initially
     [frame,EOF]=step(videoFReader);
     if EOF==true
