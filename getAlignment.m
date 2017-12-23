@@ -1,4 +1,4 @@
-function aligned=getAlignment(out,moviefps,handles,isInSecondHalf)
+function aligned=getAlignment(out,moviefps,handles)
 
 % Note that microSD (Arduino) output is timed in ms
 % Whereas video is timed in frames per sec
@@ -76,7 +76,7 @@ if settings.isInSecondHalf==true
     arduino_LED_ITIs=arduino_LED_ITIs(midLength+1:end);
 end
 [X,Y,D]=alignsignals(arduino_LED_ITIs./max(arduino_LED_ITIs),movie_LED_ITIs./max(movie_LED_ITIs));
-if isInSecondHalf==1
+if settings.isInSecondHalf==true
     D=D-midLength;
     arduino_LED_ITIs=backup_arduino_LED_ITIs;
     if D>0
@@ -103,6 +103,7 @@ else
     end
     size_of_movie=length(movie_LED(locs(1):end));
     guess_best_scale=size_of_arduino/size_of_movie;
+    guess_best_scale1=guess_best_scale;
     % Adjust according to guess_best_scale
     movie_LED=resample(movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     guess_best_delay=arduino_peak_indexIntoArduino-movie_peak_indexIntoMovie;
@@ -168,8 +169,8 @@ sumdiffs(isnan(sumdiffs))=3*ma;
 figure(); 
 imagesc(sumdiffs);
 title('Finding best alignment');
-xlabel('Trying different scales');
-ylabel('Trying different delays');
+xlabel('Trying different delays');
+ylabel('Trying different scales');
 
 frontShift=trydelays(mi_col);
 scaleBy=tryscales(mi_row);
@@ -304,57 +305,26 @@ if isfield(out,'falseCueOn')
     end
 end
 
-temp=out.cueOn';
-temp=temp(1:end);
-cue=temp(~isnan(temptimes));
-cue=alignLikeDistractor(cue,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.cue=cue./nanmax(cue);
-
+% Align cue and/or false cue
+aligned.cue=alignDataLikeDistractor(out.cueOn,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
 if isfield(out,'falseCueOn')
-    temp=out.falseCueOn';
-    temp=temp(1:end);
-    falseCueOn=temp(~isnan(temptimes));
-    falseCueOn=alignLikeDistractor(falseCueOn,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
-    aligned.falseCueOn=falseCueOn./nanmax(falseCueOn);
+    aligned.falseCueOn=alignDataLikeDistractor(out.falseCueOn,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
 end
-    
+% Align distractor from arduino
+% This is just a test for alignDataLikeDistractor method
 aligned.testRunDistractor=alignDataLikeDistractor(testRunLED,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
 
-% Align other fields from arduino
-
-settings.alignField(1).name='pelletLoaded';
-settings.alignField(1).fromarduino=1;
-
-
-temp=out.pelletLoaded';
-temp=temp(1:end);
-pelletLoaded=temp(~isnan(temptimes));
-pelletLoaded=alignLikeDistractor(pelletLoaded,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.pelletLoaded=pelletLoaded./nanmax(pelletLoaded);
-
-temp=out.pelletPresented';
-temp=temp(1:end);
-pelletPresented=temp(~isnan(temptimes));
-pelletPresented=alignLikeDistractor(pelletPresented,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.pelletPresented=pelletPresented./nanmax(pelletPresented);
-
-temp=out.encoderTrialVals';
-temp=temp(1:end);
-encoder=temp(~isnan(temptimes));
-encoder=alignLikeDistractor(encoder,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.encoder=encoder;
-
-temp=out.nDropsPerTrial';
-temp=temp(1:end);
-drops=temp(~isnan(temptimes));
-drops=alignLikeDistractor(drops,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.drops=drops;
-
-temp=out.nMissesPerTrial';
-temp=temp(1:end);
-misses=temp(~isnan(temptimes));
-misses=alignLikeDistractor(misses,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.misses=misses;
+% Align other fields from arduino or movie
+for i=1:length(settings.alignField)
+    n=settings.alignField(i).name;
+    if settings.alignField(i).fromarduino==1
+        % align like arduino
+        aligned.(n)=alignDataLikeDistractor(out.(n),temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
+    else
+        % align like movie
+        aligned.(n)=alignDataLikeMovie(handles.(n),movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
+    end
+end
 
 % Times from arduino
 timesfromarduino=alignLikeDistractor(double(arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
@@ -365,10 +335,12 @@ aligned.timesfromarduino=timesfromarduino;
 % Movie frame inds
 temp=1:length(handles.LEDvals);
 movieframeinds_raw=double(handles.discardFirstNFrames+temp);
-movieframeinds=alignLikeDistractor(movieframeinds_raw,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks);
+movieframeinds=alignLikeDistractor(movieframeinds_raw,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 movieframeinds_backup=movieframeinds;
 
-aligned.testRunDistractor_movie=alignDataLikeMovie(testRun_movieLED,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks);
+% Align distractor from movie
+% This is just a test for alignDataLikeMovie method
+aligned.testRunDistractor_movie=alignDataLikeMovie(testRun_movieLED,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 
 % In case looking at second half of savehandles
 f=fieldnames(aligned);
@@ -378,11 +350,10 @@ for i=1:length(f)
     aligned.(f{i})=curr(~isnan(temp));
 end
 movieframeinds=movieframeinds(~isnan(temp));
-
+  
 % Re-align movie frame inds based on alignment to non-interped LED vals
-maxNFramesForLEDtoChange=2;
+maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;
 deriv_LEDvals=[diff(handles.LEDvals) 0];
-% deriv_thresh=(nanmean(handles.LEDvals))/(maxNFramesForLEDtoChange+1);
 deriv_thresh=(max(handles.LEDvals)/4)/(maxNFramesForLEDtoChange+1);
 [pks,locs]=findpeaks(deriv_LEDvals);
 peakLocs=locs(pks>deriv_thresh);
@@ -440,9 +411,9 @@ for i=1:length(peakLocs)
 %     if (k>length(troughLocs_rescaled)) || (k>length(peakLocs_rescaled))
     if (k>length(troughLocs_rescaled)) 
         break
-        donotdoalign=1;
-        disp('donotdoalign');
-        break
+%         donotdoalign=1;
+%         disp('donotdoalign');
+%         break
     end
     rawmovieinds_onto_rescaled(peakLocs_rescaled(k):troughLocs_rescaled(k))=linspace(up,down,troughLocs_rescaled(k)-peakLocs_rescaled(k)+1);
     k=k+1;
@@ -533,6 +504,7 @@ plot(aligned.movieframeinds.*(1/moviefps),'Color','b');
 xlabel('Times from movie');
 set(currha,'XTickLabel','');
 % set(currha,'YTickLabel','');
+
 end
 
 function X = naninterp(X) 
@@ -543,9 +515,9 @@ return
 
 end
 
-function out=alignDataLikeMovie(data,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks)
+function out=alignDataLikeMovie(data,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1)
 
-out=alignLikeDistractor(data,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks);
+out=alignLikeDistractor(data,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 
 end
 
@@ -554,19 +526,22 @@ function out=alignDataLikeDistractor(data,times,arduino_dec,frontShift,shouldBeL
 temp=data';
 temp=temp(1:end);
 testRunDistractor=temp(~isnan(times));
-testRunDistractor=alignLikeDistractor(testRunDistractor,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
+testRunDistractor=alignLikeDistractor(testRunDistractor,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks,[]); 
 out=testRunDistractor./nanmax(testRunDistractor);
 
 end
 
-function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros,scaleBy,resampFac,moveChunks)
+function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros,scaleBy,resampFac,moveChunks,guess_best_scale1)
 
 % If like movie, scaleThisSignal=1
 % else scaleThisSignal=0
 
 signal=decimate(signal,decind);
 if scaleThisSignal==1
-    % Like movie
+    % Like movie 
+    % From initial alignment
+    signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((guess_best_scale1*100)/100)*100,100);
+    % From final alignment
     temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
     % cut off ringing artifact
     temp(end-10+1:end)=nan;
@@ -574,6 +549,7 @@ if scaleThisSignal==1
     if movieToLength>length(signal)
         signal=[signal nan(1,movieToLength-length(signal))];
     end
+    disp('here');
 else
     % Like arduino
     signal=[signal nan(1,shouldBeLength-length(signal))];

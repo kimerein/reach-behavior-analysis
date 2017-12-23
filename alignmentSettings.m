@@ -19,11 +19,11 @@ settings.movie_dec=1;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
-% If isInSecondHalf is 0, the code will start looking for an appropriate
+% If isInSecondHalf is false, the code will start looking for an appropriate
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
-% stream, indicate this by setting isInSecondHalf to 1.
-settings.isInSecondHalf=1; % set this to 1 if movie matches a later section of arduino data stream
+% stream, indicate this by setting isInSecondHalf to true.
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -75,11 +75,18 @@ settings.alignField(1).name='pelletLoaded';
 settings.alignField(1).fromarduino=1;
 settings.alignField(2).name='pelletPresented';
 settings.alignField(2).fromarduino=1;
+settings.alignField(3).name='optoOn';
+settings.alignField(3).fromarduino=1;
+settings.alignField(4).name='interlockSamples';
+settings.alignField(4).fromarduino=1;
 % These data types are from movie
-% settings.alignField(3).name='optoVals';
-% settings.alignField(3).fromarduino=0;
+% Note that the names for these should match the names of fields in
+% zoneVals
+settings.alignField(5).name='optoZone';
+settings.alignField(5).fromarduino=0;
 
-
-
+% How many frames does it take for LED to turn on?
+% This will depend on the movie frame rate
+settings.maxNFramesForLEDtoChange=2; % LED takes, at most, this many frames to turn on in movie
 
 end
