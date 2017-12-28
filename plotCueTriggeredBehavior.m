@@ -113,7 +113,7 @@ for i=1:length(plotfields)
     axes(currha);
     temp=tbt.(plotfields{i});
     plot(timespertrial,nanmean(temp(plot_cues,:),1));
-    title(plotfields{i});
+    title(plotfields{i},'Interpreter','none');
 end
 
 % Also plot experiment as events in a scatter plot
