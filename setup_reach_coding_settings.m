@@ -6,7 +6,7 @@ function settings=setup_reach_coding_settings()
 % Prompts to user
 settings.prompt1='Pause movie at a frame with both paws on perch, cue/opto on, and, if possible, with pellet in final presented position. Then press "enter" at command line. Understood?';
 settings.prompt2='Found frame? If not, set second argument to this function such that beginning of movie includes a useful frame.';
-settings.framesPerChunk=500; % how many movie frames for setup_reach_coding.m
+settings.framesPerChunk=700; % how many movie frames for setup_reach_coding.m
 
 % Save results to file?
 settings.save=1; % 1 if want to save zones data to movie directory, 0 otherwise

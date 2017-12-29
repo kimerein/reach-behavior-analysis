@@ -3,7 +3,7 @@ function alignment=integrateSDoutWithReaches(reaches,out,moviefps,alignment,save
 % Will need to fix some file alignments by lining up distractor LED onsets and offsets
 if isempty(alignment)
     alignment=getAlignment(out,moviefps,reaches);
-    save([savedir '\alignment.mat'], 'alignment');
+    save([savedir '/alignment.mat'], 'alignment');
 end
 
 % Remove incomplete reach detections
@@ -24,6 +24,6 @@ reaches.pelletPresent=reaches.pelletMissing==0;
 alignment=integrateReachTypes(reaches, alignment);
 
 % Save data
-save([savedir '\final_aligned_data.mat'],'alignment');
+save([savedir '/final_aligned_data.mat'],'alignment');
 
 end

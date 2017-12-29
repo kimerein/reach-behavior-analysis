@@ -1,6 +1,6 @@
 function alignment=integrateSDoutWithReaches(reaches,out,moviefps,alignment,savedir)
 
-% Will need to fix some file alignments by lining up cue onsets and offsets
+% Will need to fix some file alignments by lining up distractor LED onsets and offsets
 if isempty(alignment)
     alignment=getAlignment(out,moviefps,reaches);
     save([savedir '\alignment.mat'], 'alignment');
@@ -21,70 +21,9 @@ end
 reaches.pelletPresent=reaches.pelletMissing==0;
 
 % Add other events 
-movframes=alignment.movieframeinds;
-for i=1:length(f)
-    if length(reaches.(f{i}))==l
-        alignment.(f{i})=restructureEvent(reaches.(f{i}), movframes);
-    end
-end
-
-% Initiation of reach
-alignment.reachStarts=restructureEvent(reaches.reachStarts, movframes);
-% End of reach
-alignment.reachEnds=restructureEvent(reaches.pelletTime, movframes);
-% Reach given that pellet was present
-alignment.reachStarts_pelletPresent=restructureEvent(reaches.reachStarts(reaches.pelletPresent==1), movframes);
-% Successful reach (mouse eats pellet) -- initiation of successful reach
-alignment.success_reachStarts=restructureEvent(reaches.reachStarts(reaches.atePellet==1 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==0), movframes);
-% Drop (paw touches pellet, but mouse drops pellet before eating it) --
-% initiation of reach
-alignment.drop_reachStarts=restructureEvent(reaches.reachStarts(reaches.pelletTouched==1 & reaches.atePellet==0 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==0), movframes);
-% Miss (paw never touches pellet) -- initiation of reach
-alignment.miss_reachStarts=restructureEvent(reaches.reachStarts(reaches.pelletTouched==0 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==0), movframes);
-% Reach despite no pellet -- initiation of reach
-alignment.pelletmissingreach_reachStarts=restructureEvent(reaches.reachStarts(reaches.pelletPresent==0 & reaches.pawStartsOnWheel==0), movframes);
-% Eat time
-alignment.eating=restructureEvent(reaches.eatTime(reaches.atePellet==1 & reaches.pawStartsOnWheel==0), movframes);
-% Paw starts on wheel
-alignment.pawOnWheel=restructureEvent(reaches.reachStarts(reaches.pawStartsOnWheel==1), movframes);
-
-% Successful reach (mouse eats pellet) -- initiation of successful reach --
-% paw starts on wheel
-alignment.success_reachStarts_pawOnWheel=restructureEvent(reaches.reachStarts(reaches.atePellet==1 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==1), movframes);
-% Drop (paw touches pellet, but mouse drops pellet before eating it) --
-% initiation of reach -- paw starts on wheel
-alignment.drop_reachStarts_pawOnWheel=restructureEvent(reaches.reachStarts(reaches.pelletTouched==1 & reaches.atePellet==0 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==1), movframes);
-% Miss (paw never touches pellet) -- initiation of reach -- paw starts on
-% wheel
-alignment.miss_reachStarts_pawOnWheel=restructureEvent(reaches.reachStarts(reaches.pelletTouched==0 & reaches.pelletPresent==1 & reaches.pawStartsOnWheel==1), movframes);
-
-% Reach ongoing
-alignment.reach_ongoing=zeros(1,length(movframes));
-reachIsStarting=find(alignment.reachStarts>0.5);
-reachIsEnding=find(alignment.reachEnds>0.5);
-for i=1:length(reachIsStarting)
-    currReachStarts=reachIsStarting(i);
-    temp=reachIsEnding-currReachStarts;
-    temp(temp<0)=max(temp)+10000;
-    [~,mi]=min(temp);
-    alignment.reach_ongoing(reachIsStarting(i):reachIsEnding(mi))=1;
-end
+alignment=integrateReachTypes(reaches, alignment);
 
 % Save data
-save([savedir '\final_aligned_data.mat'],'alignment');
-
-end
-
-function eventVector=restructureEvent(eventFrames, movieFrames)
-
-eventFrames=eventFrames(~isnan(eventFrames));
-eventVector=zeros(1,length(movieFrames));
-for i=1:length(eventFrames)
-%    [~,mi]=min(abs(movieFrames-eventFrames(i)));
-   temp=movieFrames-eventFrames(i);
-   temp(temp<0)=max(temp)+10000;
-   [~,mi]=min(temp); 
-   eventVector(mi)=1;    
-end
+save([savedir '/final_aligned_data.mat'],'alignment');
 
 end
