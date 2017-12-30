@@ -327,7 +327,7 @@ for i=1:length(settings.alignField)
 end
 
 % Times from arduino
-timesfromarduino=alignLikeDistractor(double(arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
+hetimesfromarduino=alignLikeDistractor(double(arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
 aligned.timesfromarduino=timesfromarduino;
 
 % From movie
@@ -549,7 +549,6 @@ if scaleThisSignal==1
     if movieToLength>length(signal)
         signal=[signal nan(1,movieToLength-length(signal))];
     end
-    disp('here');
 else
     % Like arduino
     signal=[signal nan(1,shouldBeLength-length(signal))];

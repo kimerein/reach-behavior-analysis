@@ -14,6 +14,9 @@ function analyzeReachVideo(videoFile,discardFirstNFrames)
 endofVfname=regexp(videoFile,'\.');
 endofDir=regexp(videoFile,'/');
 
+%% Save discardFirstNFrames for rest of analysis
+autoReachAnalysisSettings(discardFirstNFrames);
+
 %% Get user-defined movie zones
 setup_reach_coding(videoFile,discardFirstNFrames);
 
