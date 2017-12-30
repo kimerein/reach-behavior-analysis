@@ -57,13 +57,17 @@ end
 tbt.times=nan(length(cueInds),max(cueIndITIs)+pointsFromPreviousTrial);
 
 % Organize trial-by-trial data
+bufferInds=0;
 for i=1:length(cueInds)
     if i==length(cueInds)
         theseInds=cueInds(i)-pointsFromPreviousTrial:length(cue);
+        bufferInds=0;
     elseif i==1
         theseInds=1:cueInds(i+1)-1;
+        bufferInds=(cueInds(i+1)-1)-points;
     else
         theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
+        bufferInds=0;
     end
     for j=1:length(f)
         temp=tbt.(f{j});
@@ -83,11 +87,8 @@ for i=1:length(f)
 end
 
 % Get times per trial
-tbt.times=tbt.times-repmat(nanmin(tbt.timesfromarduino,[],2),1,size(tbt.timesfromarduino,2));
-timespertrial=nanmean(tbt.timesfromarduino,1);
-
-times_tbt=times_tbt-repmat(nanmin(times_tbt,[],2),1,size(times_tbt,2));
-timespertrial=nanmean(times_tbt,1);
+tbt.times=tbt.times-repmat(nanmin(tbt.times,[],2),1,size(tbt.times,2));
+timespertrial=nanmean(tbt.times,1);
 
 % Exclude trials where paw was on wheel while wheel turning
 if excludePawOnWheelTrials==1
@@ -116,7 +117,7 @@ for i=1:length(plotfields)
     axes(currha);
     temp=tbt.(plotfields{i});
     plot(timespertrial,nanmean(temp(plot_cues,:),1));
-    title(plotfields{i});
+    title(plotfields{i},'Interpreter','none');
 end
 
 % Also plot experiment as events in a scatter plot
@@ -124,26 +125,6 @@ figure();
 k=1;
 plotfields=settings.plotevents;
 for i=plot_cues
-    for j=1:length(plotfields)
-        currEvents=tbt.(plotfields{j});
-        event_thresh=settings.eventThresh{j};
-        event_ind=find(currEvents(i,:)>event_thresh);
-        n=length(event_ind);
-        if ischar(settings.firstN{j})
-            if strcmp('all',settings.firstN{j})
-                % plot all events
-            end
-        else
-            % plot first n events
-            n=settings.firstN{j};
-        end    
-        for l=1:n
-            scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
-                'MarkerFaceColor',settings.eventColors{j},...
-                'LineWidth',settings.eventLineWidth);
-            hold on; 
-        end       
-    end
     if ~isempty(settings.shading_type)
         % Shade some trials
         if ismember('ITI',settings.shading_type)
@@ -167,6 +148,26 @@ for i=plot_cues
                 end
             end
         end
+    end
+    for j=1:length(plotfields)
+        currEvents=tbt.(plotfields{j});
+        event_thresh=settings.eventThresh{j};
+        event_ind=find(currEvents(i,:)>event_thresh);
+        n=length(event_ind);
+        if ischar(settings.firstN{j})
+            if strcmp('all',settings.firstN{j})
+                % plot all events
+            end
+        else
+            % plot first n events
+            n=settings.firstN{j};
+        end    
+        for l=1:n
+            scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
+                'MarkerFaceColor',settings.eventColors{j},...
+                'LineWidth',settings.eventLineWidth);
+            hold on; 
+        end       
     end
     k=k+1;
 end

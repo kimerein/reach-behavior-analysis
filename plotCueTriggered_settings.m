@@ -6,6 +6,13 @@ function settings=plotCueTriggered_settings()
 settings.maxITI=30; % in seconds, maximal ITI
 settings.minITI=2; % in seconds, minimal ITI
 
+% Min height of cue or pellet presented peak relative to neighboring
+% samples
+% Increase for more stringent cue / pellet presented detection
+% Decrease to pick up more peaks
+% settings.relativePeakHeight=1*10^35; 
+settings.nStdDevs=1; % relative peak height in terms of standard deviations away from mean
+% i.e., greater than nStdDevs * nanstd(data) away from mean
 
 % Experiment block types:
 

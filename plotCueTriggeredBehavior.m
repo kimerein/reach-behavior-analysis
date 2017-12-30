@@ -192,8 +192,12 @@ function [cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode)
 
 cue=nonparamZscore(cue); % non-parametric Z score
 
+settings=plotCueTriggered_settings();
+peakHeight=nanmean(cue)+settings.nStdDevs*nanstd(cue);
+relativePeakHeight=settings.nStdDevs*nanstd(cue);
+
 [pks,locs]=findpeaks(cue);
-cueInds=locs(pks>(1*10^35));
+cueInds=locs(pks>peakHeight);
 % cueInds=[1 cueInds length(cue)]; % in case aliasing problem is at edges
 cueIndITIs=diff(cueInds);
 checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
@@ -205,8 +209,9 @@ for i=1:length(checkTheseIntervals)
     end
 end 
 
-[pks,locs]=findpeaks(cue);
-cueInds=locs(pks>(1*10^35));
+% [pks,locs]=findpeaks(cue);
+[pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',relativePeakHeight);
+cueInds=locs(pks>peakHeight);
 cueIndITIs=diff(cueInds);
 checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
@@ -219,6 +224,6 @@ cueInds=cueInds(~isnan(cueInds));
 cueIndITIs=diff(cueInds);
 
 cue=cue./nanmax(cue);
-
+ 
 end
 

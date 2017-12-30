@@ -6,6 +6,10 @@ function settings=plotCueTriggered_settings()
 settings.maxITI=30; % in seconds, maximal ITI
 settings.minITI=2; % in seconds, minimal ITI
 
+% Min height of cue or pellet presented peak relative to neighboring
+% samples
+% Increase for 
+settings.relativePeakHeight=1*10^35; 
 
 % Experiment block types:
 
@@ -23,8 +27,7 @@ settings.blockITIThresh=[10]; % boundaries between ITI block lengths, in seconds
 
 % Shading colors
 % The indices here correspond to indices into shading_type
-settings.shading_colors={{[0
-                        
+settings.shading_colors={{[0.9 0.9 0.9],'none'}};                        
 
 % How many time points to include from previous trial at the beginning of
 % each trial
@@ -35,7 +38,7 @@ settings.pointsFromPreviousTrial=100;
 
 % Which fields from data to plot as averaged trial-by-trial
 % List the field names to plot (these are field names from data variable in
-% plotCueTriggeredBehavior.m
+% plotCueTriggeredBehavior.m)
 settings.plotfields={'cue', ...
                      'arduino_distractor',...
                      'pelletLoaded',...
@@ -43,7 +46,7 @@ settings.plotfields={'cue', ...
                      'optoOn',...
                      'interlockSamples',...
                      'reachStarts',...
-                     'reachOngoing',...
+                     'reach_ongoing',...
                      'success_reachStarts',...
                      'drop_reachStarts',...
                      'miss_reachStarts',...
@@ -143,13 +146,21 @@ settings.shiftBack={0,...
                     0,...
                     0,...
                     0.2};
-                
-                
-% Also plot histogram of certain events: 
 
-% Which events to include in trial-averaged histogram
-% Include field names in this list
-settings.histodata={'reachStarts'};
-
+                
+% Plot histogram of events (or trial-by-trial average), with data types
+% overlapping:
+                
+% Which fields from data to plot as overlapping averaged trial-by-trial 
+% List the field names to plot (these are field names from data variable in
+% plotCueTriggeredBehavior.m) in histoplotfields
+% Note that will also shift each event time for each data type by 
+% histoshiftBack
+settings.histoplotfields={'cue',...
+                          'pelletPresented',...
+                          'reachStarts'};
+settings.histoshiftBack={0.2,...
+                         0.2,...
+                         0};
 
 end
