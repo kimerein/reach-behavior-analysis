@@ -52,8 +52,8 @@ settings.fractionThroughArduino=1/8;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=0.1;
-settings.try_scale2=0.15; 
+settings.try_scale1=-0.01;
+settings.try_scale2=0.03; 
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie

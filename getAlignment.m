@@ -635,7 +635,11 @@ for i=1:length(segmentInds)-1
         end 
     end
     currChunk=[currChunk currChunk(end)*ones(1,addZeros(i))];
-    currChunk=currChunk(moveChunks(i,1):moveChunks(i,2));
+    if moveChunks(i,2)>length(currChunk)
+        currChunk=currChunk(moveChunks(i,1):end);
+    else
+        currChunk=currChunk(moveChunks(i,1):moveChunks(i,2));
+    end
     outsignal=[outsignal currChunk];
 end
 

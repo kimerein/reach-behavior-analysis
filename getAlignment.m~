@@ -113,13 +113,15 @@ else
     else
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):locs_arduino((-D)+1+length(movie_LED_ITIs))));
     end
-    size_of_movie=length(movie_LED(locs(1):end));
+    size_of_movie=length(movie_LED(locs(1):locs(end)));
     guess_best_scale=size_of_arduino/size_of_movie;
     guess_best_scale1=guess_best_scale;
     % Adjust according to guess_best_scale
-    movledinds=
+    movledinds=1:length(movie_LED);
     movie_LED=resample(movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
-    
+    movledinds=resample(movledinds,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
+    [~,mi]=min(abs(movledinds-movie_peak_indexIntoMovie));
+    movie_peak_indexIntoMovie=mi;
     guess_best_delay=arduino_peak_indexIntoArduino-movie_peak_indexIntoMovie;
     trydelays=guess_best_delay+settings.try_delay1:guess_best_delay+settings.try_delay2;
     % Note that fixed, so now best scale is 1
@@ -633,6 +635,7 @@ for i=1:length(segmentInds)-1
         end 
     end
     currChunk=[currChunk currChunk(end)*ones(1,addZeros(i))];
+    if moveChunks
     currChunk=currChunk(moveChunks(i,1):moveChunks(i,2));
     outsignal=[outsignal currChunk];
 end
