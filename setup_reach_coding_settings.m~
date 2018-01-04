@@ -55,6 +55,6 @@ settings.zones(7).analysisField='optoZone';
 settings.zones(7).takeImageValue='red';
 
 settings.zones(8).name='lick zone';
-settings.zones(8).prompt='Draw a polygon enclosing the region where mouse tongue goes when mouse licks (not including the reward droplet).';
-settings.zones(8).analysisField='lickZone';
-settings.zones(8).takeImageValue='intensity';
+settings.zones(8).prompt='Draw a polygon enclosing the area illuminated when the optogenetic stimulus turns on.';
+settings.zones(8).analysisField='optoZone';
+settings.zones(8).takeImageValue='red';

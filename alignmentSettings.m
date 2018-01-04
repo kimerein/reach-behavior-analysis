@@ -17,13 +17,23 @@ settings.scale_factor=floor(settings.arduino_fs/settings.movie_fs);
 settings.arduino_dec=settings.scale_factor;
 settings.movie_dec=1;
 
+% Throw out distractor LED durations in movie or arduino less than this
+% many ms
+settings.useDistractorThresh=175; % in ms
+
+% If, for example, experimenter forget to include LED in movie frame at beginning of
+% experiment, but Arduino was on, need to discard beginning of arduino
+% distractor LED. Discard this much time from the beginning of arduino
+% distractor LED.
+% settings.discardTimeArduinoLED=80; % in seconds
+
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
 % If isInSecondHalf is false, the code will start looking for an appropriate
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -33,7 +43,7 @@ settings.isInSecondHalf=true; % set this to true if movie matches a later sectio
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=3/4; 
+settings.fractionThroughArduino=1/8; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -42,8 +52,8 @@ settings.fractionThroughArduino=3/4;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=0;
-settings.try_scale2=0.05; 
+settings.try_scale1=0.1;
+settings.try_scale2=0.15; 
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -61,7 +71,8 @@ settings.try_delay2=200;
 
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
-settings.alignSegments=600; % how many indices in each sub-section to independently align
+% settings.alignSegments=600; % how many indices in each sub-section to independently align
+settings.alignSegments=1300; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
@@ -79,11 +90,15 @@ settings.alignField(3).name='optoOn';
 settings.alignField(3).fromarduino=1;
 settings.alignField(4).name='interlockSamples';
 settings.alignField(4).fromarduino=1;
+settings.alignField(5).name='solenoidOn';
+settings.alignField(5).fromarduino=1;
 % These data types are from movie
 % Note that the names for these should match the names of fields in
 % zoneVals
-settings.alignField(5).name='optoZone';
-settings.alignField(5).fromarduino=0;
+settings.alignField(6).name='optoZone';
+settings.alignField(6).fromarduino=0;
+settings.alignField(7).name='lickZone';
+settings.alignField(7).fromarduino=0;
 
 % How many frames does it take for LED to turn on?
 % This will depend on the movie frame rate
