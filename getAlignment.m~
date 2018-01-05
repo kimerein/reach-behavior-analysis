@@ -76,7 +76,7 @@ arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 
 % Get how throwOutMovie indexes into handles.LEDvals
 throwOutMovie=interp(throwOutMovie,movie_dec);
-movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
+movie_LED_for_finalalignment(throwOutMovie>0.5)
 
 % Discard beginning of Arduino LED
 % arduino_LED(arduino_dec_times<settings.discardTimeArduinoLED)=nan;
@@ -391,8 +391,7 @@ movieframeinds=movieframeinds(~isnan(temp));
 % This deals with skipping of low frame rate DVR
 % allEvents_rawLED=handles.LEDvals;
 % allEvents_realignedLED=aligned.movie_distractor;
-% handles.LEDvals=throwOutOnStretches(handles.LEDvals,movieframeinds_raw,6);
-handles.LEDvals=movie_LED_for_finalalignment;
+handles.LEDvals=throwOutOnStretches(handles.LEDvals,movieframeinds_raw,6);
 % aligned.movie_distractor=throwOutOnStretches(aligned.movie_distractor,movieframeinds,3);
 
 maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;

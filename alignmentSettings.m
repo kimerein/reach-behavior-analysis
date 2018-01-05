@@ -52,8 +52,8 @@ settings.fractionThroughArduino=1/8;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.01;
-settings.try_scale2=0.01; 
+settings.try_scale1=-0.0075;
+settings.try_scale2=0.0075; 
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -66,8 +66,8 @@ settings.try_scale2=0.01;
 % different delays similar to this best guess. The code will try all delays
 % between
 % trydelays=guess_best_delay+try_delay1:guess_best_delay+try_delay2;
-settings.try_delay1=-200;
-settings.try_delay2=200;
+settings.try_delay1=-150;
+settings.try_delay2=150;
 
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
@@ -99,6 +99,11 @@ settings.alignField(6).name='optoZone';
 settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
 settings.alignField(7).fromarduino=0;
+
+settings.alignWithAllEvents=0;
+
+% Whether to use LED distractor to further align movieframeinds
+settings.donotdoalign=0; % 0 if want further alignment of movieframeinds based on LED distractor, else 1
 
 % How many frames does it take for LED to turn on?
 % This will depend on the movie frame rate
