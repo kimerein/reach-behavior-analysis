@@ -15,10 +15,26 @@ alignment=reachFromWheel(reaches, alignment, movframes);
 alignment=successReachFromWheel(reaches, alignment, movframes);
 alignment=dropReachFromWheel(reaches, alignment, movframes);
 alignment=missReachFromWheel(reaches, alignment, movframes);
+alignment=reachOngoing(reaches, alignment, movframes);
+alignment=reachOngoing(reaches, alignment, movframes);
 
 end
 
-function
+function alignment=reachOngoing(reaches, alignment, movframes)
+
+% Reach ongoing
+alignment.reach_ongoing=zeros(1,length(movframes));
+reachIsStarting=find(alignment.reachStarts>0.5);
+reachIsEnding=find(alignment.reachEnds>0.5);
+for i=1:length(reachIsStarting)
+    currReachStarts=reachIsStarting(i);
+    temp=reachIsEnding-currReachStarts;
+    temp(temp<0)=max(temp)+10000;
+    [~,mi]=min(temp);
+    alignment.reach_ongoing(reachIsStarting(i):reachIsEnding(mi))=1;
+end
+
+end
 
 function alignment=missReachFromWheel(reaches, alignment, movframes)
 
@@ -105,6 +121,13 @@ function alignment=reachInitiation(reaches, alignment, movframes)
 
 % Initiation of reach
 alignment.reachStarts=restructureEvent(reaches.reachStarts, movframes);
+
+end
+
+function alignment=lickInitiation(reaches, alignment, movframes)
+
+% Initiation of lick
+alignment.lickStarts=restructureEvent(reaches.lickStarts, movframes);
 
 end
 

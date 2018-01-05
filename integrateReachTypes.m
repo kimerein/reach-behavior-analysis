@@ -16,6 +16,7 @@ alignment=successReachFromWheel(reaches, alignment, movframes);
 alignment=dropReachFromWheel(reaches, alignment, movframes);
 alignment=missReachFromWheel(reaches, alignment, movframes);
 alignment=reachOngoing(reaches, alignment, movframes);
+alignment=lickInitiation(reaches, alignment, movframes);
 
 end
 
@@ -120,6 +121,13 @@ function alignment=reachInitiation(reaches, alignment, movframes)
 
 % Initiation of reach
 alignment.reachStarts=restructureEvent(reaches.reachStarts, movframes);
+
+end
+
+function alignment=lickInitiation(reaches, alignment, movframes)
+
+% Initiation of lick
+alignment.lickStarts=restructureEvent(reaches.lickStarts, movframes);
 
 end
 

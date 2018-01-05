@@ -53,7 +53,7 @@ settings.fractionThroughArduino=1/8;
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
 settings.try_scale1=-0.01;
-settings.try_scale2=0.03; 
+settings.try_scale2=0.01; 
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -72,7 +72,7 @@ settings.try_delay2=200;
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
-settings.alignSegments=1300; % how many indices in each sub-section to independently align
+settings.alignSegments=10000; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 

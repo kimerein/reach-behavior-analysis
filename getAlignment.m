@@ -43,6 +43,7 @@ end
 temp=temp(1:end);
 arduino_LED=temp(~isnan(temptimes));
 arduino_times=temptimes(~isnan(temptimes));
+backup_arduino_times=arduino_times;
 
 % Find alignment
 % First down-sample arduino LED
@@ -67,6 +68,8 @@ movie_LED(temp<0.5)=0;
 
 % Throw out LED distractor on intervals less than settings.useDistractorThresh
 % This deals with skipping of low frame rate DVR
+allEvents_arduino_LED=arduino_LED;
+allEvents_movie_LED=movie_LED;
 arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 movie_LED=throwOutOnStretches(movie_LED,movie_times);
 
@@ -119,6 +122,7 @@ else
     % Adjust according to guess_best_scale
     movledinds=1:length(movie_LED);
     movie_LED=resample(movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
+    allEvents_movie_LED=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     movledinds=resample(movledinds,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     [~,mi]=min(abs(movledinds-movie_peak_indexIntoMovie));
     movie_peak_indexIntoMovie=mi;
@@ -127,7 +131,6 @@ else
     % Note that fixed, so now best scale is 1
     guess_best_scale=1;
     tryscales=guess_best_scale+settings.try_scale1:tryinc:guess_best_scale+settings.try_scale2;
-    backup_movie_LED=movie_LED;
 end
 
 figure();
@@ -147,8 +150,10 @@ legend({'Arduino distractor','Movie distractor'});
 % Test signal alignment and scaling
 disp('Now refining alignment ...');
 sumdiffs=nan(length(tryscales),length(trydelays));
-backup_movie_LED=movie_LED;
-backup_arduino_LED=arduino_LED;
+backup_movie_LED=allEvents_movie_LED;
+backup_arduino_LED=allEvents_arduino_LED;
+% backup_movie_LED=movie_LED;
+% backup_arduino_LED=arduino_LED;
 for j=1:length(tryscales)
     if mod(j,10)==0
         disp('Processing ...');
@@ -233,7 +238,7 @@ for i=1:length(segmentInds)-1
     else
         [temp1,temp2,D]=alignsignals(best_movie(currInd:currInd+alignSegments-1),best_arduino(currInd:currInd+alignSegments-1));
     end
-    segmentDelays(i)=D;
+    segmentDelays(i)=0;
     if length(temp1)>length(temp2)
         addZeros_arduino(i)=length(temp1)-length(temp2);
         temp2=[temp2 temp2(end)*ones(1,length(temp1)-length(temp2))];
@@ -347,7 +352,7 @@ for i=1:length(settings.alignField)
 end
 
 % Times from arduino
-timesfromarduino=alignLikeDistractor(double(arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
+timesfromarduino=alignLikeDistractor(double(backup_arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
 aligned.timesfromarduino=timesfromarduino;
 
 % From movie
