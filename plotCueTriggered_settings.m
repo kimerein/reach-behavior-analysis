@@ -19,13 +19,13 @@ settings.nStdDevs=1; % relative peak height in terms of standard deviations away
 % Get to choose one or more types of trial shading for the event plot
 % shading_type can include
 % 'ITI'     blocks determined by different ITI lengths
-% settings.shading_type={'ITI'};
-settings.shading_type={};
+settings.shading_type={'ITI'};
+% settings.shading_type={};
 
 % For experiments with blocks of different trial lengths
 % If 'ITI' is included in shading_type, will shade each block of a different
 % trial length with a different  color
-settings.blockITIThresh=[10]; % boundaries between ITI block lengths, in seconds
+settings.blockITIThresh=[15]; % boundaries between ITI block lengths, in seconds
 % e.g., if there are 2 trial lengths, blockITIThresh is the threshold that
 % distinguishes short and long trials
 

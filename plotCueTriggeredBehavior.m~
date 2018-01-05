@@ -130,32 +130,23 @@ for i=plot_cues
             event_ind_cue=find(tbt.cue(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
             if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
-            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & timespertrial(event_ind_pellet)<settings.blockITIThresh)
+            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 && (timespertrial(event_ind_pellet)<settings.blockITIThresh)
                 % Fast block
-                if strcmp(shades{2},'none')
-                else
-                    line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
-                end
             else
+                % Slo
+            elseif (timespertrial(event_ind_pellet(end))-timespertrial(event_ind_cue))>settings.blockITIThresh
                 % Slow block
                 if strcmp(shades{1},'none')
                 else
                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
                 end
+            else
+                % Fast block
+                if strcmp(shades{2},'none')
+                else
+                    line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
+                end
             end
-%             elseif (timespertrial(event_ind_pellet(end))-timespertrial(event_ind_cue))>settings.blockITIThresh
-%                 % Slow block
-%                 if strcmp(shades{1},'none')
-%                 else
-%                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
-%                 end
-%             else
-%                 % Fast block
-%                 if strcmp(shades{2},'none')
-%                 else
-%                     line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
-%                 end
-%             end
         end
     end
     for j=1:length(plotfields)
@@ -198,8 +189,6 @@ for i=1:length(plotfields)
     end
 end
 legend(plotfields);
-
-
 
 end
 
