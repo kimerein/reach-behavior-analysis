@@ -75,8 +75,8 @@ arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 [movie_LED,throwOutMovie]=throwOutOnStretches(movie_LED,movie_times);
 
 % Get how throwOutMovie indexes into handles.LEDvals
-throwOutMovie=interp(throwOutMovie,movie_dec);
-movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
+% throwOutMovie=interp(throwOutMovie,movie_dec);
+% movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
 
 % Discard beginning of Arduino LED
 % arduino_LED(arduino_dec_times<settings.discardTimeArduinoLED)=nan;
@@ -127,7 +127,7 @@ else
     % Adjust according to guess_best_scale
     movledinds=1:length(movie_LED);
     movie_LED=resample(movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
-    allEvents_movie_LED=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
+    % allEvents_movie_LED=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     movledinds=resample(movledinds,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     [~,mi]=min(abs(movledinds-movie_peak_indexIntoMovie));
     movie_peak_indexIntoMovie=mi;
@@ -158,6 +158,12 @@ sumdiffs=nan(length(tryscales),length(trydelays));
 if settings.alignWithAllEvents==1
     backup_movie_LED=allEvents_movie_LED;
     backup_arduino_LED=allEvents_arduino_LED;
+    
+    [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
+    throwOutMovie=interp(throwOutMovie,movie_dec);
+    movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
+    disp('here');
 else
     backup_movie_LED=movie_LED;
     backup_arduino_LED=arduino_LED;

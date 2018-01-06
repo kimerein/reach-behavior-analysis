@@ -100,7 +100,7 @@ settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
 settings.alignField(7).fromarduino=0;
 
-settings.alignWithAllEvents=0;
+settings.alignWithAllEvents=1;
 
 % Whether to use LED distractor to further align movieframeinds
 settings.donotdoalign=0; % 0 if want further alignment of movieframeinds based on LED distractor, else 1

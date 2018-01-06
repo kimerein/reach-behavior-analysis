@@ -120,7 +120,28 @@ end
 figure();
 k=1;
 plotfields=settings.plotevents;
+lastTrialShaded=0;
+trialTypes=nan(1,length(plot_cues));
 for i=plot_cues
+    % Classify this trial type
+    if (k==1 && settings.excludeFirstTrial==1) || (lastTrialShaded==0)
+        % Skip this trial
+    else
+        % Classify trial type based on opto and shading of last trial
+        if any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==1
+            % opto and last trial was slow block, i.e., licking
+            trialTypes(k)=1; % licking opto
+        elseif ~any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==1
+            % control and last trial was slow block, i.e., licking
+            trialTypes(k)=2; % licking control
+        elseif any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==2
+            % opto and last trial was fast block, i.e., reaching
+            trialTypes(k)=3;
+        elseif ~any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==2
+            % control and last trial was fast block, i.e., reaching
+            trialTypes(k)=4;
+        end
+    end
     if ~isempty(settings.shading_type)
         % Shade some trials
         if ismember('ITI',settings.shading_type)
@@ -132,12 +153,14 @@ for i=plot_cues
             if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & timespertrial(event_ind_pellet)<settings.blockITIThresh)
                 % Fast block
+                lastTrialShaded=2;
                 if strcmp(shades{2},'none')
                 else
                     line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
                 end
             else
                 % Slow block
+                lastTrialShaded=1;
                 if strcmp(shades{1},'none')
                 else
                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
@@ -199,7 +222,49 @@ for i=1:length(plotfields)
 end
 legend(plotfields);
 
+% Time down-sample tbt
+f=fieldnames(tbt);
+binWins=1:settings.binByN:size(tbt.(f{1}),2);
+temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
+for i=1:length(f)
+    temp=tbt.(f{i});
+    for j=1:length(binWins)-1
+        temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+    end
+    ds_tbt.(f{i})=temp2;
+end
+backup_tbt=tbt;
+tbt=ds_tbt;
+new_timespertrial=nan(1,length(binWins)-1);
+for j=1:length(binWins)-1
+    new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
+end
+timespertrial=new_timespertrial;
 
+u=unique(trialTypes);
+u=u(~isnan(u));
+for j=1:length(u)
+    plot_cues=trialTypes==u(j); % Only use trials of this type
+    % Plot overlap trial-by-trial average
+    figure();
+    plotfields=settings.trialType_plotfields;
+    for i=1:length(plotfields)
+        temp=tbt.(plotfields{i});
+        if i==1
+            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1));
+        else
+            temp2=nansum(temp(plot_cues,:),1);
+%             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
+            plot(timespertrial-settings.trialType_shiftBack{i},temp2);
+        end
+        hold all;
+        if i==1
+            ma=nanmax(nansum(temp(plot_cues,:),1));
+        end
+    end
+    legend(plotfields);
+    title(settings.trialType_name{j});
+end
 
 end
 
