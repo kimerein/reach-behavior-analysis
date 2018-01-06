@@ -69,7 +69,8 @@ for i=1:length(cueInds)
         temp=tbt.(f{j});
         temp1=data.(f{j});
         temp(i,1:length(theseInds))=temp1(theseInds);
-        tbt.(f{j})=temp;
+            tbt.(f{j})=temp;
+        end
     end
     % Get times
     tbt.times(i,1:length(theseInds))=data.movieframeinds(theseInds).*bettermode;
@@ -102,6 +103,9 @@ if excludePawOnWheelTrials==1
     end
 else
     plot_cues=1:size(tbt.cue,1);
+end
+if settings.excludeFirstTrial==1
+    plot_cues=plot_cues(~ismember(plot_cues,1));
 end
 
 % Plot trial-by-trial average
@@ -225,10 +229,21 @@ legend(plotfields);
 % Time down-sample tbt
 f=fieldnames(tbt);
 binWins=1:settings.binByN:size(tbt.(f{1}),2);
+temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
 for i=1:length(f)
     temp=tbt.(f{i});
-    ds_tbt.(f{i})=
-
+    for j=1:length(binWins)-1
+        temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+    end
+    ds_tbt.(f{i})=temp2;
+end
+backup_tbt=tbt;
+tbt=ds_tbt;
+new_timespertrial=nan(1,length(binWins)-1);
+for j=1:length(binWins)-1
+    new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
+end
+timespertrial=new_timespertrial;
 
 u=unique(trialTypes);
 u=u(~isnan(u));
@@ -240,10 +255,11 @@ for j=1:length(u)
     for i=1:length(plotfields)
         temp=tbt.(plotfields{i});
         if i==1
-            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1));
+            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
         else
             temp2=nansum(temp(plot_cues,:),1);
-            plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
+%             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
+            plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
         end
         hold all;
         if i==1

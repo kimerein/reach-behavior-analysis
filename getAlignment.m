@@ -20,7 +20,8 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
-threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
+threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
+% threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 figure();
 movie_times=0:(1/moviefps)*1000:(length(temp_LED)-1)*((1/moviefps)*1000);
 plot(movie_times,temp_LED,'Color','b');
@@ -74,10 +75,6 @@ allEvents_movie_LED=movie_LED;
 arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 [movie_LED,throwOutMovie]=throwOutOnStretches(movie_LED,movie_times);
 
-% Get how throwOutMovie indexes into handles.LEDvals
-% throwOutMovie=interp(throwOutMovie,movie_dec);
-% movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
-
 % Discard beginning of Arduino LED
 % arduino_LED(arduino_dec_times<settings.discardTimeArduinoLED)=nan;
 
@@ -127,7 +124,6 @@ else
     % Adjust according to guess_best_scale
     movledinds=1:length(movie_LED);
     movie_LED=resample(movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
-    % allEvents_movie_LED=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     movledinds=resample(movledinds,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     [~,mi]=min(abs(movledinds-movie_peak_indexIntoMovie));
     movie_peak_indexIntoMovie=mi;
@@ -152,19 +148,27 @@ plot([nan(1,guess_best_delay) movie_LED],'Color','r');
 title('Preliminary alignment of movie distractor onto arduino distractor');
 legend({'Arduino distractor','Movie distractor'});
 
+% Wait for user to confirm preliminary alignment
+pause;
+
 % Test signal alignment and scaling
 disp('Now refining alignment ...');
 sumdiffs=nan(length(tryscales),length(trydelays));
 if settings.alignWithAllEvents==1
     backup_movie_LED=allEvents_movie_LED;
     backup_arduino_LED=allEvents_arduino_LED;
-    
-    % [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    % Remove LED distractor on intervals that are too short (i.e., may have
+    % been missed in movie, shorter than 3 movie frames)
     [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,1:length(backup_movie_LED),3);
     backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     throwOutMovie=interp(throwOutMovie,movie_dec);
     movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
-    disp('here');
+    figure(); 
+    plot(allEvents_movie_LED,'Color','b'); 
+    hold on; 
+    plot(movie_LED_for_finalalignment,'Color','r');
+    legend({'before removal','after removal'});
+    title('Remove short, skipped frame LED distractors before alignment');
 else
     backup_movie_LED=movie_LED;
     backup_arduino_LED=arduino_LED;
@@ -396,11 +400,7 @@ movieframeinds=movieframeinds(~isnan(temp));
 
 % Throw out LED distractor on intervals less than settings.useDistractorThresh
 % This deals with skipping of low frame rate DVR
-% allEvents_rawLED=handles.LEDvals;
-% allEvents_realignedLED=aligned.movie_distractor;
-% handles.LEDvals=throwOutOnStretches(handles.LEDvals,movieframeinds_raw,6);
 handles.LEDvals=movie_LED_for_finalalignment;
-% aligned.movie_distractor=throwOutOnStretches(aligned.movie_distractor,movieframeinds,3);
 
 maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;
 deriv_LEDvals=[diff(handles.LEDvals) 0];
@@ -453,6 +453,11 @@ if length(peakLocs_rescaled)>length(troughLocs_rescaled)
 end
 k=1;
 donotdoalign=settings.donotdoalign;
+if length(peakLocs_rescaled)~=length(peakLocs)
+    disp('May be a problem: different numbers of LED distractor flashes during alignment of movieframeinds');
+else
+    disp('Good: matching LED distractor flashes during alignment of movieframeinds');
+end
 for i=1:length(peakLocs)
     up=movieframeinds_raw(peakLocs(i));
     down=movieframeinds_raw(troughLocs(i));

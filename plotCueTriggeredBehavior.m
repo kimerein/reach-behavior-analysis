@@ -72,6 +72,7 @@ for i=1:length(cueInds)
         tbt.(f{j})=temp;
     end
     % Get times
+    tbt.times(i,:)=nan;
     tbt.times(i,1:length(theseInds))=data.movieframeinds(theseInds).*bettermode;
 end
 
@@ -102,6 +103,9 @@ if excludePawOnWheelTrials==1
     end
 else
     plot_cues=1:size(tbt.cue,1);
+end
+if settings.excludeFirstTrial==1
+    plot_cues=plot_cues(~ismember(plot_cues,1));
 end
 
 % Plot trial-by-trial average
@@ -151,7 +155,7 @@ for i=plot_cues
             event_ind_cue=find(tbt.cue(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
             if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
-            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & timespertrial(event_ind_pellet)<settings.blockITIThresh)
+            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
                 lastTrialShaded=2;
                 if strcmp(shades{2},'none')
@@ -251,11 +255,11 @@ for j=1:length(u)
     for i=1:length(plotfields)
         temp=tbt.(plotfields{i});
         if i==1
-            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1));
+            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
         else
             temp2=nansum(temp(plot_cues,:),1);
 %             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
-            plot(timespertrial-settings.trialType_shiftBack{i},temp2);
+            plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
         end
         hold all;
         if i==1

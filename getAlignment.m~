@@ -20,7 +20,8 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
-threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
+threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
+% threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 figure();
 movie_times=0:(1/moviefps)*1000:(length(temp_LED)-1)*((1/moviefps)*1000);
 plot(movie_times,temp_LED,'Color','b');
@@ -73,10 +74,6 @@ allEvents_arduino_LED=arduino_LED;
 allEvents_movie_LED=movie_LED;
 arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 [movie_LED,throwOutMovie]=throwOutOnStretches(movie_LED,movie_times);
-
-% Get how throwOutMovie indexes into handles.LEDvals
-% throwOutMovie=interp(throwOutMovie,movie_dec);
-% movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
 
 % Discard beginning of Arduino LED
 % arduino_LED(arduino_dec_times<settings.discardTimeArduinoLED)=nan;
@@ -159,7 +156,9 @@ if settings.alignWithAllEvents==1
     backup_movie_LED=allEvents_movie_LED;
     backup_arduino_LED=allEvents_arduino_LED;
     
-    [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    % [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,1:length(backup_movie_LED),3);
+    backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     throwOutMovie=interp(throwOutMovie,movie_dec);
     movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
     disp('here');

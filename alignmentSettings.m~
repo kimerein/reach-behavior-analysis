@@ -77,7 +77,7 @@ settings.try_delay2=150;
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
-settings.alignSegments=2500; % how many indices in each sub-section to independently align
+settings.alignSegments=10000; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
@@ -105,8 +105,6 @@ settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
 settings.alignField(7).fromarduino=0;
 
-% Whether to add back all LED distractor events (including short ones, on
-% the edge of what movie frame rate can capture) before final alignment
 settings.alignWithAllEvents=1;
 
 % Whether to use LED distractor to further align movieframeinds
