@@ -159,7 +159,8 @@ if settings.alignWithAllEvents==1
     backup_movie_LED=allEvents_movie_LED;
     backup_arduino_LED=allEvents_arduino_LED;
     
-    [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    % [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,movie_times);
+    [backup_movie_LED,throwOutMovie]=throwOutOnStretches(backup_movie_LED,1:length(backup_movie_LED),3);
     backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     throwOutMovie=interp(throwOutMovie,movie_dec);
     movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
