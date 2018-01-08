@@ -216,10 +216,12 @@ disp(mi_col);
 disp('Best scale row');
 disp(mi_row);
 
+temp=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
 frontShift=trydelays(mi_col);
 scaleBy=tryscales(mi_row);
 resampFac=1/tryinc;
-best_movie=[nan(1,trydelays(mi_col)) resample(backup_movie_LED,floor(tryscales(mi_row)*(1/tryinc)),floor(1/tryinc))];
+best_movie=[nan(1,trydelays(mi_col)) resample(temp,floor(tryscales(mi_row)*(1/tryinc)),floor(1/tryinc))];
+% best_movie=[nan(1,trydelays(mi_col)) resample(backup_movie_LED,floor(tryscales(mi_row)*(1/tryinc)),floor(1/tryinc))];
 shouldBeLength=length(best_movie);
 best_arduino=[backup_arduino_LED nan(1,length(best_movie)-length(backup_arduino_LED))];
 movieToLength=length(best_arduino);
@@ -330,6 +332,45 @@ legend({'Movie','Arduino'});
 aligned.movie_distractor=mov_distractor;
 aligned.arduino_distractor=arduino_distractor;
 
+% Times from arduino
+timesfromarduino=alignLikeDistractor(double(backup_arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
+aligned.timesfromarduino=timesfromarduino; % note that this is in ms
+
+% Get rid of extraneous arduino LED distractor on intervals, in case of
+% skipping these in movie due to low DVR frame rate with respect to LED on
+% duration
+fi=find(~isnan(mov_distractor),1,'first');
+minLEDinterval=settings.minLEDinterval*1000; % convert from seconds to ms
+indInterval=nanmean(diff(aligned.timesfromarduino));
+indThresh=floor(minLEDinterval/indInterval);
+for i=fi:length(arduino_distractor)
+    if arduino_distractor(i)>0.5
+        % arduino distractor on
+        % check for movie distractor on within indThresh of fi
+        if i-indThresh<1
+            tryInds=1:i+indThresh;
+        elseif i+indThresh>length(mov_distractor) || i+indThresh>length(arduino_distractor)
+            tryInds=i-indThresh:min([length(mov_distractor) length(arduino_distractor)]);
+        else
+            tryInds=i-indThresh:i+indThresh;
+        end
+        if any(mov_distractor(tryInds)>0.5)
+            % movie picked up this distractor
+        else
+            % movie failed to pick up this distractor
+            % zero out this on interval in arduino distractor
+            arduino_distractor(tryInds)=0;
+        end
+    end
+end
+aligned.arduino_distractor=arduino_distractor;
+figure();
+plot(mov_distractor,'Color','r');
+hold on;
+plot(arduino_distractor,'Color','b');
+title('Alignment of movie distractor onto arduino distractor after removing skipped arduino on intervals');
+legend({'Movie','Arduino'});
+
 % Align other signals in same fashion as LED distractor
 % From Arduino
 
@@ -370,10 +411,6 @@ for i=1:length(settings.alignField)
     end
 end
 
-% Times from arduino
-timesfromarduino=alignLikeDistractor(double(backup_arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
-aligned.timesfromarduino=timesfromarduino;
-
 % From movie
 
 % Movie frame inds
@@ -399,20 +436,22 @@ movieframeinds=movieframeinds(~isnan(temp));
 % Re-align movie frame inds based on alignment to non-interped LED vals
 
 % Throw out LED distractor on intervals less than settings.useDistractorThresh
-% This deals with skipping of low frame rate DVR
-handles.LEDvals=movie_LED_for_finalalignment;
+% This is one way to deal with skipping of low frame rate DVR
+% handles.LEDvals=movie_LED_for_finalalignment;
 
 maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;
 deriv_LEDvals=[diff(handles.LEDvals) 0];
 deriv_thresh=(max(handles.LEDvals)/2)/(maxNFramesForLEDtoChange+1);
-[pks,locs]=findpeaks(deriv_LEDvals);
-peakLocs=locs(pks>deriv_thresh);
-tooclose=diff(peakLocs);
-peakLocs=peakLocs(tooclose>=3*maxNFramesForLEDtoChange);
-[pks,locs]=findpeaks(-deriv_LEDvals);
-troughLocs=locs(pks>deriv_thresh);
-tooclose=diff(troughLocs);
-troughLocs=troughLocs(tooclose>=3*maxNFramesForLEDtoChange);
+[~,peakLocs]=findpeaks(deriv_LEDvals,'MinPeakProminence',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+% [pks,locs]=findpeaks(deriv_LEDvals);
+% peakLocs=locs(pks>deriv_thresh);
+% tooclose=diff(peakLocs);
+% peakLocs=peakLocs(tooclose>=3*maxNFramesForLEDtoChange);
+[~,troughLocs]=findpeaks(-deriv_LEDvals,'MinPeakProminence',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+% [pks,locs]=findpeaks(-deriv_LEDvals);
+% troughLocs=locs(pks>deriv_thresh);
+% tooclose=diff(troughLocs);
+% troughLocs=troughLocs(tooclose>=3*maxNFramesForLEDtoChange);
 rawmovieinds_onto_rescaled=nan(size(movieframeinds));
 if movieframeinds_raw(peakLocs(1))<movieframeinds_raw(troughLocs(1))
     % LED first increases
@@ -429,15 +468,17 @@ if movieframeinds_raw(peakLocs(1))>=movieframeinds_raw(troughLocs(1))
 end
 rescaled_thresh=0.5;
 deriv_LEDvals_rescaled=[diff(aligned.movie_distractor) 0];
-[pks,locs]=findpeaks(deriv_LEDvals_rescaled);
-peakLocs_rescaled=locs(pks>rescaled_thresh);
-tooclose=diff(peakLocs_rescaled);
-peakLocs_rescaled=peakLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
+[~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakProminence',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+% [pks,locs]=findpeaks(deriv_LEDvals_rescaled);
+% peakLocs_rescaled=locs(pks>rescaled_thresh);
+% tooclose=diff(peakLocs_rescaled);
+% peakLocs_rescaled=peakLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
 peakTimes_rescaled=movieframeinds(peakLocs_rescaled);
-[pks,locs]=findpeaks(-deriv_LEDvals_rescaled);
-troughLocs_rescaled=locs(pks>rescaled_thresh);
-tooclose=diff(troughLocs_rescaled);
-troughLocs_rescaled=troughLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
+[~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakProminence',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+% [pks,locs]=findpeaks(-deriv_LEDvals_rescaled);
+% troughLocs_rescaled=locs(pks>rescaled_thresh);
+% tooclose=diff(troughLocs_rescaled);
+% troughLocs_rescaled=troughLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
 troughTimes_rescaled=movieframeinds(troughLocs_rescaled);
 if peakTimes_rescaled(1)<troughTimes_rescaled(1)
     % LED first increases
@@ -461,8 +502,8 @@ end
 for i=1:length(peakLocs)
     up=movieframeinds_raw(peakLocs(i));
     down=movieframeinds_raw(troughLocs(i));
-    [~,mi_up]=min(abs(peakTimes_rescaled-up));
-    [~,mi_down]=min(abs(troughTimes_rescaled-down));
+%     [~,mi_up]=min(abs(peakTimes_rescaled-up));
+%     [~,mi_down]=min(abs(troughTimes_rescaled-down));
 %     if (k>length(troughLocs_rescaled)) || (k>length(peakLocs_rescaled))
     if (k>length(troughLocs_rescaled)) 
         break

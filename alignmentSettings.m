@@ -9,6 +9,9 @@ function settings=alignmentSettings()
 % distractor)
 settings.fractionRange=0.1;
 
+% Minimum time between distractor LED on intervals
+settings.minLEDinterval=1; % in seconds
+
 % Need to resample movie and arduino data so that indices represent
 % matching times
 settings.arduino_fs=1000; % arduino data sampling rate in Hz
@@ -77,7 +80,8 @@ settings.try_delay2=150;
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
-settings.alignSegments=2500; % how many indices in each sub-section to independently align
+settings.alignSegments=1750; % how many indices in each sub-section to independently align
+% settings.alignSegments=2500; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
