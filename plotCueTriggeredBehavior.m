@@ -245,6 +245,9 @@ for j=1:length(binWins)-1
 end
 timespertrial=new_timespertrial;
 
+% Add together reaches when pellet available, starting from perch
+tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
+
 u=unique(trialTypes);
 u=u(~isnan(u));
 for j=1:length(u)

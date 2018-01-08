@@ -38,7 +38,7 @@ settings.useDistractorThresh=175; % in ms
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -48,7 +48,7 @@ settings.isInSecondHalf=false; % set this to true if movie matches a later secti
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=1/8; 
+settings.fractionThroughArduino=4.5/6; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -57,7 +57,7 @@ settings.fractionThroughArduino=1/8;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.0075;
+settings.try_scale1=-0.01;
 settings.try_scale2=0.0075; 
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
