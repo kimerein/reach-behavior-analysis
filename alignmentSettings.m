@@ -11,6 +11,7 @@ settings.fractionRange=0.1;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
+settings.minCueInterval=0.2; % in seconds
 
 % Need to resample movie and arduino data so that indices represent
 % matching times
@@ -107,6 +108,8 @@ settings.alignField(5).fromarduino=1;
 settings.alignField(6).name='optoZone';
 settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
+settings.alignField(7).fromarduino=0;
+settings.alignField(7).name='cueZone';
 settings.alignField(7).fromarduino=0;
 
 % Whether to add back all LED distractor events (including short ones, on

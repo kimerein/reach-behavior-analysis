@@ -33,10 +33,13 @@ out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(
 %% Align Arduino output data and data from video file
 aligned=getAlignment(out,30,savehandles);
 
+%% Clean up cue from movie
+aligned=cleanUpCue(aligned);
+
 %% Put Arduino output data and data from video file together    
 [status]=mkdir([videoFile(1:endofVfname(end)-1) '_processed_data']);
 finaldata=integrateSDoutWithReaches(savehandles,out,30,aligned,[videoFile(1:endofVfname(end)-1) '_processed_data']);  
-     
+
 %% Plot results
 tbt=plotCueTriggeredBehavior(finaldata,'cue',1);
 save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');

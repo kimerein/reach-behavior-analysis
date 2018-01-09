@@ -1,7 +1,8 @@
 function tbt=plotCueTriggeredBehavior(data,nameOfCue,excludePawOnWheelTrials)
 
 % nameOfCue should be 'cue' for real cue
-% 'arduino_distractor' for distractor
+% 'cueZone_onVoff' for cue from movie
+% or 'arduino_distractor' for distractor
 
 % Get cue/data type for triggering trial-by-trial data
 cue=data.(nameOfCue); 
@@ -69,10 +70,10 @@ for i=1:length(cueInds)
         temp=tbt.(f{j});
         temp1=data.(f{j});
         temp(i,1:length(theseInds))=temp1(theseInds);
-            tbt.(f{j})=temp;
-        end
+        tbt.(f{j})=temp;
     end
     % Get times
+    tbt.times(i,:)=nan;
     tbt.times(i,1:length(theseInds))=data.movieframeinds(theseInds).*bettermode;
 end
 
@@ -155,7 +156,7 @@ for i=plot_cues
             event_ind_cue=find(tbt.cue(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
             if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
-            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & timespertrial(event_ind_pellet)<settings.blockITIThresh)
+            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
                 lastTrialShaded=2;
                 if strcmp(shades{2},'none')
@@ -245,6 +246,9 @@ for j=1:length(binWins)-1
 end
 timespertrial=new_timespertrial;
 
+% Add together reaches when pellet available, starting from perch
+tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
+
 u=unique(trialTypes);
 u=u(~isnan(u));
 for j=1:length(u)
@@ -269,6 +273,10 @@ for j=1:length(u)
     legend(plotfields);
     title(settings.trialType_name{j});
 end
+
+end
+
+function [cue,cueInds,cueIndITIs]=fixAliasing_(cue,maxITI,minITI,bettermode)
 
 end
 

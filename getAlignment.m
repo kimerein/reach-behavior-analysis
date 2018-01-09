@@ -381,6 +381,7 @@ for i=1:size(out.cueOn,1)
     temp(find(out.cueOn(i,:)>0.5,1,'first'))=1;
     out.cueOn(i,:)=temp;
 end
+
 if isfield(out,'falseCueOn')
     for i=1:size(out.falseCueOn,1)
         temp=zeros(size(out.falseCueOn(i,:)));
@@ -441,8 +442,9 @@ movieframeinds=movieframeinds(~isnan(temp));
 
 maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;
 deriv_LEDvals=[diff(handles.LEDvals) 0];
-deriv_thresh=(max(handles.LEDvals)/2)/(maxNFramesForLEDtoChange+1);
-[~,peakLocs]=findpeaks(deriv_LEDvals,'MinPeakProminence',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+deriv_thresh=0.2*range(deriv_LEDvals(deriv_LEDvals>=0));
+% deriv_thresh=(max(handles.LEDvals)/2)/(maxNFramesForLEDtoChange+1);
+[~,peakLocs]=findpeaks(deriv_LEDvals,'MinPeakHeight',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals);
 % peakLocs=locs(pks>deriv_thresh);
 % tooclose=diff(peakLocs);
@@ -468,7 +470,8 @@ if movieframeinds_raw(peakLocs(1))>=movieframeinds_raw(troughLocs(1))
 end
 rescaled_thresh=0.5;
 deriv_LEDvals_rescaled=[diff(aligned.movie_distractor) 0];
-[~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakProminence',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+% rescaled_thresh=0.25*range(deriv_LEDvals_rescaled(deriv_LEDvals_rescaled>=0));
+[~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals_rescaled);
 % peakLocs_rescaled=locs(pks>rescaled_thresh);
 % tooclose=diff(peakLocs_rescaled);
@@ -514,6 +517,7 @@ for i=1:length(peakLocs)
     rawmovieinds_onto_rescaled(peakLocs_rescaled(k):troughLocs_rescaled(k))=linspace(up,down,troughLocs_rescaled(k)-peakLocs_rescaled(k)+1);
     k=k+1;
 end
+rawmovieinds_onto_rescaled=rawmovieinds_onto_rescaled+0.5; % accounts for shift from [diff(handles.LEDvals) 0];
 if donotdoalign==0
     % Fill in nans accordingly
     firstnan=find(isnan(rawmovieinds_onto_rescaled),1,'first');

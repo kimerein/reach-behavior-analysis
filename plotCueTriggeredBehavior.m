@@ -1,7 +1,8 @@
 function tbt=plotCueTriggeredBehavior(data,nameOfCue,excludePawOnWheelTrials)
 
 % nameOfCue should be 'cue' for real cue
-% 'arduino_distractor' for distractor
+% 'cueZone_onVoff' for cue from movie
+% or 'arduino_distractor' for distractor
 
 % Get cue/data type for triggering trial-by-trial data
 cue=data.(nameOfCue); 
@@ -20,7 +21,11 @@ bettermode=mode(timeIncs); % in ms
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
-[cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode);
+if strcmp(nameOfCue,'cueZone_onVoff')
+    [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
+else
+    [cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode);
+end
 [data.pelletPresented,presentedInds]=fixAliasing(data.pelletPresented,maxITI,minITI,bettermode);
 
 % Checking cue detection
@@ -91,9 +96,10 @@ timespertrial=nanmean(tbt.times,1);
 if excludePawOnWheelTrials==1
     % Find trials where paw was on wheel while wheel turning
     plot_cues=[];
-    for i=1:size(tbt.cue,1)
+    for i=1:size(tbt.(nameOfCue),1)
         presentInd=find(tbt.pelletPresented(i,:)>0.5,1,'first');
-        cueInd=find(tbt.cue(i,:)>0.5,1,'first');
+        temp=tbt.(nameOfCue);
+        cueInd=find(temp(i,:)>0.5,1,'first');
         pawWasOnWheel=0;
         if any(tbt.pawOnWheel(i,presentInd:cueInd)>0.5)
             pawWasOnWheel=1;
@@ -102,7 +108,7 @@ if excludePawOnWheelTrials==1
         end
     end
 else
-    plot_cues=1:size(tbt.cue,1);
+    plot_cues=1:size(tbt.(nameOfCue),1);
 end
 if settings.excludeFirstTrial==1
     plot_cues=plot_cues(~ismember(plot_cues,1));
@@ -152,7 +158,8 @@ for i=plot_cues
             % Shade trials according to ITI lengths
             shades=settings.shading_colors{find(ismember(settings.shading_type,'ITI'))};
             event_thresh=0.5;
-            event_ind_cue=find(tbt.cue(i,:)>event_thresh,1,'first');
+            temp=tbt.(nameOfCue);
+            event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
             if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
@@ -272,6 +279,42 @@ for j=1:length(u)
     legend(plotfields);
     title(settings.trialType_name{j});
 end
+
+end
+
+function [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode)
+
+settings=plotCueTriggered_settings();
+peakHeight=0.5;
+
+[pks,locs]=findpeaks(cue);
+cueInds=locs(pks>peakHeight);
+% cueInds=[1 cueInds length(cue)]; % in case aliasing problem is at edges
+cueIndITIs=diff(cueInds);
+checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
+for i=1:length(checkTheseIntervals)
+    indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
+    if any(cue(indsIntoCue)>0.001)
+        [~,ma]=max(cue(indsIntoCue)); 
+        cue(indsIntoCue(ma))=max(cue);
+    end
+end 
+
+% [pks,locs]=findpeaks(cue);
+[pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',peakHeight);
+cueInds=locs(pks>peakHeight);
+cueIndITIs=diff(cueInds);
+checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
+if ~isempty(checkTheseIntervals)
+    for i=1:length(checkTheseIntervals)
+        cue(cueInds(checkTheseIntervals(i)))=0;
+        cueInds(checkTheseIntervals(i))=nan; 
+    end
+end
+cueInds=cueInds(~isnan(cueInds));
+cueIndITIs=diff(cueInds);
+
+cue=cue./nanmax(cue);
 
 end
 
