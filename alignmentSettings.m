@@ -5,7 +5,7 @@ function settings=alignmentSettings()
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-settings.discardLastN=316;
+settings.discardLastN=644;
 
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED

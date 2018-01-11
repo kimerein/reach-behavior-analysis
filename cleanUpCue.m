@@ -9,3 +9,9 @@ isOn=aligned.cueZone>(thresh*range(aligned.cueZone))+min(aligned.cueZone);
 temp(isOn)=1;
 temp(~isOn)=0;
 aligned.cueZone_onVoff=temp;
+
+figure();
+plot(aligned.cueZone,'Color','k'); 
+hold on;
+line([0 length(aligned.cueZone)],[(thresh*range(aligned.cueZone))+min(aligned.cueZone) (thresh*range(aligned.cueZone))+min(aligned.cueZone)],'Color','r');
+title('Cleaning up cue from movie');
