@@ -12,7 +12,7 @@ function analyzeReachVideo(videoFile,discardFirstNFrames)
 % plotCueTriggered_settings.m    : how to plot experimental results
 
 endofVfname=regexp(videoFile,'\.');
-endofDir=regexp(videoFile,'/');
+endofDir=regexp(videoFile,'\');
 
 %% Save discardFirstNFrames for rest of analysis
 autoReachAnalysisSettings(discardFirstNFrames);
@@ -25,10 +25,13 @@ setup_reach_coding(videoFile,discardFirstNFrames);
 
 %% Re-format movie data as events
 savehandles=reformatAutoClassifyOutput(out,zoneVals,reaches,pellets,eat,paw,fidget,settings);
-save([videoFile(1:endofVfname(end)-1) 'savehandles.mat'],'savehandles');
+save([videoFile(1:endofVfname(end)-1) '_savehandles.mat'],'savehandles');
 
 %% Get Arduino output data
-out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)) 'parsedOutput.mat']);
+out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
+
+%% Discard end of video
+savehandles=discardLastNFrames(savehandles);
 
 %% Align Arduino output data and data from video file
 aligned=getAlignment(out,30,savehandles);

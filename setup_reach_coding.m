@@ -57,7 +57,7 @@ end
 fig=implay(allframes,30);
 fig.Parent.Position=[100 100 800 800];
 pause;
-if contains(version,'2017b')
+if ~isempty(regexp(version,'2017b','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;

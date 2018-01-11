@@ -92,7 +92,11 @@ temp1=arduino_LED_ITIs./max(arduino_LED_ITIs);
 temp2=movie_LED_ITIs./max(movie_LED_ITIs);
 % temp1=temp1-nanmean(temp1);
 % temp2=temp2-nanmean(temp2);
-[X,Y,D]=alignsignals(temp1,temp2); 
+if isempty(settings.maxlagForInitialAlign)
+    [X,Y,D]=alignsignals(temp1,temp2); 
+else
+    [X,Y,D]=alignsignals(temp1,temp2,settings.maxlagForInitialAlign); 
+end
 if settings.isInSecondHalf==true
     D=D-midLength;
     arduino_LED_ITIs=backup_arduino_LED_ITIs;
