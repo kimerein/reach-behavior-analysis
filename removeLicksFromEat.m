@@ -1,11 +1,12 @@
 function eat=removeLicksFromEat(eat,zoneVals)
 
 eat.isChewing_backup=eat.isChewing;
+temp=eat.isChewing;
 
 % When paws or tongue in lick zone, not chewing
-temp=eat.isChewing;
-temp(eat.licks.isReach==1)=0;
-eat.isChewing=temp;
+% temp=eat.isChewing;
+% temp(eat.licks.isReach==1)=0;
+% eat.isChewing=temp;
 
 % Only take chewing bouts consistent with chewing A PELLET (i.e., that last
 % long enough, longer than settings.chew.minTimeToChewPellet)
