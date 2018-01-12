@@ -3,7 +3,9 @@ function savehandles=discardLastNFrames(savehandles)
 settings=alignmentSettings;
 
 discardLastN=settings.discardLastN;
-savehandles.discardLastN=discardLastN;
+if discardLastN==0
+    return
+end
 totalFrames=sum(~isnan(savehandles.LEDvals))+savehandles.discardFirstNFrames;
 lastNFrames=totalFrames-discardLastN+1:totalFrames;
 
@@ -14,3 +16,13 @@ for i=1:length(f)
         lastNotNan=find(~isnan(savehandles.(f{i})),1,'last');
         temp=savehandles.(f{i});
         temp(lastNotNan-discardLastN+1:lastNotNan)=nan;
+        savehandles.(f{i})=temp;
+    elseif ~ischar(savehandles.(f{i}))
+        % Event refer to inds
+        temp=savehandles.(f{i});
+        temp=temp(~(temp>=lastNFrames(1) & temp<=lastNFrames(end)));
+        savehandles.(f{i})=temp;
+    end
+end
+
+savehandles.discardLastN=discardLastN;

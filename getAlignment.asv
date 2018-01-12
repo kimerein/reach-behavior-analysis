@@ -263,7 +263,7 @@ for i=1:length(segmentInds)-1
     else
         [temp1,temp2,D]=alignsignals(best_movie(currInd:currInd+alignSegments-1),best_arduino(currInd:currInd+alignSegments-1));
     end
-    segmentDelays(i)=D;
+    segmentDelays(i)=0;
     if length(temp1)>length(temp2)
         addZeros_arduino(i)=length(temp1)-length(temp2);
         temp2=[temp2 temp2(end)*ones(1,length(temp1)-length(temp2))];

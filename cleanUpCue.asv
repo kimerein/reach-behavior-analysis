@@ -12,7 +12,7 @@ subtractDistract=1;
 
 cueZone=aligned.cueZone;
 if subtractDistract==1
-    cueZone=cueZone-(range(cueZone)*aligned.movie_distractor);
+    cueZ
 
 temp=nan(size(cueZone));
 isOn=cueZone>(thresh*range(cueZone))+min(cueZone);
