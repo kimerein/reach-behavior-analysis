@@ -12,7 +12,10 @@ subtractDistract=1;
 
 cueZone=aligned.cueZone;
 if subtractDistract==1
+    mi=min(cueZone);
     cueZone=cueZone-(range(cueZone)*aligned.movie_distractor);
+    cueZone(cueZone<mi)=mi;
+end
 
 temp=nan(size(cueZone));
 isOn=cueZone>(thresh*range(cueZone))+min(cueZone);
@@ -21,7 +24,7 @@ temp(~isOn)=0;
 aligned.cueZone_onVoff=temp;
 
 figure();
-plot(aligned.cueZone,'Color','k'); 
+plot(cueZone,'Color','k'); 
 hold on;
-line([0 length(aligned.cueZone)],[(thresh*range(aligned.cueZone))+min(aligned.cueZone) (thresh*range(aligned.cueZone))+min(aligned.cueZone)],'Color','r');
+line([0 length(cueZone)],[(thresh*range(cueZone))+min(cueZone) (thresh*range(cueZone))+min(cueZone)],'Color','r');
 title('Cleaning up cue from movie');
