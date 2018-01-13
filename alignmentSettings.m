@@ -121,8 +121,10 @@ settings.alignField(6).name='optoZone';
 settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
 settings.alignField(7).fromarduino=0;
-settings.alignField(7).name='cueZone';
-settings.alignField(7).fromarduino=0;
+settings.alignField(8).name='cueZone';
+settings.alignField(8).fromarduino=0;
+settings.alignField(9).name='isGrooming';
+settings.alignField(9).fromarduino=0;
 
 % Whether to add back all LED distractor events (including short ones, on
 % the edge of what movie frame rate can capture) before final alignment

@@ -35,6 +35,7 @@ savehandles=discardLastNFrames(savehandles);
 
 %% Align Arduino output data and data from video file
 aligned=getAlignment(out,30,savehandles);
+save([videoFile(1:endofVfname(end)-1) '_aligned.mat'],'aligned');
 
 %% Clean up cue from movie
 aligned=cleanUpCue(aligned);
