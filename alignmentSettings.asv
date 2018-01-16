@@ -131,8 +131,7 @@ settings.alignField(9).fromarduino=0;
 % the edge of what movie frame rate can capture) before final alignment
 settings.alignWithAllEvents=1;
 
-% Whether to allow user to manually zero out LED distractor on intervals
-settings.doManualZeroOut=0; % 1 if want this user option, 0 otherwise
+% Whether to allow user to manually zx
 
 % Whether to use LED distractor to further align movieframeinds
 settings.donotdoalign=0; % 0 if want further alignment of movieframeinds based on LED distractor, else 1
