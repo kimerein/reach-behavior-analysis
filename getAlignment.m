@@ -480,7 +480,7 @@ deriv_thresh=0.5*range(deriv_LEDvals(deriv_LEDvals>=0));
 % peakLocs=locs(pks>deriv_thresh);
 % tooclose=diff(peakLocs);
 % peakLocs=peakLocs(tooclose>=3*maxNFramesForLEDtoChange);
-[~,troughLocs]=findpeaks(-deriv_LEDvals,'MinPeakProminence',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+[~,troughLocs]=findpeaks(-deriv_LEDvals,'MinPeakHeight',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(-deriv_LEDvals);
 % troughLocs=locs(pks>deriv_thresh);
 % tooclose=diff(troughLocs);
@@ -500,7 +500,7 @@ if movieframeinds_raw(peakLocs(1))>=movieframeinds_raw(troughLocs(1))
     error('Problem in raw LED values -- should always turn on, then off');
 end
 rescaled_thresh=0.5;
-deriv_LEDvals_rescaled=[diff(double(aligned.movie_distractor>0.2)) 0];
+deriv_LEDvals_rescaled=[diff(double(aligned.movie_distractor>0.5)) 0];
 % rescaled_thresh=0.25*range(deriv_LEDvals_rescaled(deriv_LEDvals_rescaled>=0));
 [~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals_rescaled);
@@ -508,7 +508,7 @@ deriv_LEDvals_rescaled=[diff(double(aligned.movie_distractor>0.2)) 0];
 % tooclose=diff(peakLocs_rescaled);
 % peakLocs_rescaled=peakLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
 peakTimes_rescaled=movieframeinds(peakLocs_rescaled);
-[~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakProminence',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+[~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(-deriv_LEDvals_rescaled);
 % troughLocs_rescaled=locs(pks>rescaled_thresh);
 % tooclose=diff(troughLocs_rescaled);
@@ -522,10 +522,10 @@ else
     troughLocs_rescaled=troughLocs_rescaled(2:end);
     troughTimes_rescaled=troughTimes_rescaled(2:end);
 end
-if length(peakLocs_rescaled)>length(troughLocs_rescaled)
-    peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
-    peakTimes_rescaled=peakTimes_rescaled(1:length(troughLocs_rescaled));
-end
+% if length(peakLocs_rescaled)>length(troughLocs_rescaled)
+%     peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
+%     peakTimes_rescaled=peakTimes_rescaled(1:length(troughLocs_rescaled));
+% end
 k=1;
 donotdoalign=settings.donotdoalign;
 if length(peakLocs_rescaled)~=length(peakLocs)

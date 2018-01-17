@@ -39,7 +39,8 @@ settings.useDistractorThresh=160; % in ms
 % experiment, but Arduino was on, need to discard beginning of arduino
 % distractor LED. Discard this much time from the beginning of arduino
 % distractor LED.
-settings.discardTimeArduinoLED=3; % in seconds
+% settings.discardTimeArduinoLED=3; % in seconds
+settings.discardTimeArduinoLED=0; % in seconds
 
 % Maxlag for initial alignment
 % May help constrain alignment for better results
