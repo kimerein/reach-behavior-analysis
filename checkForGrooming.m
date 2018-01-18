@@ -38,7 +38,8 @@ while i<=numRegions
                     continue % without incrementing i
                 end
             otherwise
-                error('Unrecognized user input. Input should be "yes", "no" or "both".');
+                disp('Unrecognized user input. Input should be "yes", "no" or "both".');
+                continue % without incrementing i
         end
     end
     i=i+1;
