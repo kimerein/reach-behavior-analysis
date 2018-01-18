@@ -2,6 +2,8 @@ function eat=checkForGrooming(eat,settings)
 
 movieframeinds=settings.discardFirstNFrames:settings.discardFirstNFrames+length(eat.isChewing)-1;
 
+eat.isChewing_backup=eat.isChewing;
+
 chew=eat.isChewing;
 [labeledVector,numRegions]=bwlabel(chew);
 % Check each stretch for grooming
