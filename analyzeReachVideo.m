@@ -45,7 +45,8 @@ aligned=cleanUpCue(aligned);
 finaldata=integrateSDoutWithReaches(savehandles,out,30,aligned,[videoFile(1:endofVfname(end)-1) '_processed_data']);  
 
 %% Plot results
-tbt=plotCueTriggeredBehavior(finaldata,'cue',1);
+% tbt=plotCueTriggeredBehavior(finaldata,'cue',1);
+tbt=plotCueTriggeredBehavior(finaldata,'cueZone_onVoff',0);
 save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');
 
 end
