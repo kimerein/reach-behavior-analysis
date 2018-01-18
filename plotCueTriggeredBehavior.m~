@@ -217,6 +217,7 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
+if settings.histoDropGrooming==1
     % Find trials when animal was grooming during cue and exclude these
     % trials
     temp=tbt.(nameOfCue);
@@ -226,11 +227,6 @@ groomingTrials=[];
             % exclude this trial
             groomingTrials=[groomingTrials i];
         end
-    end
-    plot_cues=plot_cues(~ismember(plot_cues,groomingTrials));
-    disp('Excluding from histograms the following trials where mouse was grooming during cue');
-    disp(groomingTrials);
-end
 
 % Plot overlap trial-by-trial average
 figure();
