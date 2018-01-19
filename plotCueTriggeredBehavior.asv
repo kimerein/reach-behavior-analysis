@@ -247,10 +247,7 @@ if settings.dropChewingInCue==1
             chewingTrials=[chewingTrials i];
         end
     end
-    plot_cues=plot_cues(~ismember(plot_cues,chewingTrials));
-    disp('Excluding from histograms the following trials where mouse was chewing during cue');
-    disp(chewingTrials);
-end
+    plotCu
 
 % Plot overlap trial-by-trial average
 figure();
