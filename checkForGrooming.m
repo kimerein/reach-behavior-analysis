@@ -2,6 +2,8 @@ function eat=checkForGrooming(eat,settings)
 
 movieframeinds=settings.discardFirstNFrames:settings.discardFirstNFrames+length(eat.isChewing)-1;
 
+eat.isChewing_backup=eat.isChewing;
+
 chew=eat.isChewing;
 [labeledVector,numRegions]=bwlabel(chew);
 % Check each stretch for grooming
@@ -36,7 +38,8 @@ while i<=numRegions
                     continue % without incrementing i
                 end
             otherwise
-                error('Unrecognized user input. Input should be "yes", "no" or "both".');
+                disp('Unrecognized user input. Input should be "yes", "no" or "both".');
+                continue % without incrementing i
         end
     end
     i=i+1;

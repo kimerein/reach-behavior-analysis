@@ -161,7 +161,8 @@ for i=plot_cues
             temp=tbt.(nameOfCue);
             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
+            if isempty(event_ind_pellet)
+            elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
                 lastTrialShaded=2;
@@ -217,7 +218,6 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
-if settings.histoDropGrooming==1
     % Find trials when animal was grooming during cue and exclude these
     % trials
     temp=tbt.(nameOfCue);

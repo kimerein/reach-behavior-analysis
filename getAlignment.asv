@@ -31,6 +31,7 @@ title('Threshold for distinguishing LED on vs off');
 
 % Get when LED was on in movie vs off
 movie_LED=single(temp_LED>threshForOnVsOff);
+formovieframeinds_align=movie_LED;
 movie_LED_for_finalalignment=movie_LED;
 
 % Find best alignment of distractor LED in movie and Arduino output -- note
@@ -68,15 +69,15 @@ temp=movie_LED;
 movie_LED(temp>=0.5)=1;
 movie_LED(temp<0.5)=0;
 
+% Discard beginning of Arduino LED
+arduino_LED(arduino_times<settings.discardTimeArduinoLED*1000)=nan; % convert discardTimeArduinoLED to ms
+
 % Throw out LED distractor on intervals less than settings.useDistractorThresh
 % This deals with skipping of low frame rate DVR
 allEvents_arduino_LED=arduino_LED;
 allEvents_movie_LED=movie_LED;
 arduino_LED=throwOutOnStretches(arduino_LED,arduino_times);
 [movie_LED,throwOutMovie]=throwOutOnStretches(movie_LED,movie_times);
-
-% Discard beginning of Arduino LED
-% arduino_LED(arduino_dec_times<settings.discardTimeArduinoLED)=nan;
 
 [pks_arduino,locs_arduino]=findpeaks(arduino_LED);
 arduino_LED_ITIs=diff(arduino_times(locs_arduino));
@@ -160,6 +161,7 @@ disp('Now refining alignment ...');
 sumdiffs=nan(length(tryscales),length(trydelays));
 if settings.alignWithAllEvents==1
     backup_movie_LED=allEvents_movie_LED;
+    forSecondaryAlignment=backup_movie_LED;
     backup_arduino_LED=allEvents_arduino_LED;
     % Remove LED distractor on intervals that are too short (i.e., may have
     % been missed in movie, shorter than 3 movie frames)
@@ -175,6 +177,7 @@ if settings.alignWithAllEvents==1
     title('Remove short, skipped frame LED distractors before alignment');
 else
     backup_movie_LED=movie_LED;
+    forSecondaryAlignment=backup_movie_LED;
     backup_arduino_LED=arduino_LED;
 end
 for j=1:length(tryscales)
@@ -220,7 +223,7 @@ disp(mi_col);
 disp('Best scale row');
 disp(mi_row);
 
-temp=resample(allEvents_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
+temp=resample(forSecondaryAlignment,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
 frontShift=trydelays(mi_col);
 scaleBy=tryscales(mi_row);
 resampFac=1/tryinc;
@@ -238,6 +241,12 @@ hold on;
 plot(best_arduino,'Color','b');
 title('Alignment of movie distractor onto arduino distractor before small segment adjustments');
 legend({'Movie','Arduino'});
+
+% Allow user to zero out any spurious LED distractors before further
+% alignment
+if settings.doManualZeroOut==1
+    [best_movie,best_arduino]=zeroOutDialog(best_movie,best_arduino);
+end
 
 % Then re-align sub-sections of movie to arduino code
 alignSegments=settings.alignSegments; % in number of indices
@@ -263,7 +272,7 @@ for i=1:length(segmentInds)-1
     else
         [temp1,temp2,D]=alignsignals(best_movie(currInd:currInd+alignSegments-1),best_arduino(currInd:currInd+alignSegments-1));
     end
-    segmentDelays(i)=0;
+    segmentDelays(i)=D;
     if length(temp1)>length(temp2)
         addZeros_arduino(i)=length(temp1)-length(temp2);
         temp2=[temp2 temp2(end)*ones(1,length(temp1)-length(temp2))];
@@ -320,6 +329,23 @@ for i=1:length(segmentInds)-1
             endAt=tookTheseIndsOfTemp1(end);
         end
     end
+    % Check to be sure that edges are LED off
+    tryj=1;
+    while temp1(startAt)>0.5 || temp2(startAt)>0.5
+        if temp1(startAt+tryj)<0.5 && temp2(startAt+tryj)<0.5
+            startAt=startAt+tryj;
+            break
+        end
+        tryj=tryj+1;
+    end
+    tryj=1;
+    while temp1(endAt)>0.5 || temp2(endAt)>0.5
+        if temp1(endAt-tryj)<0.5 && temp2(endAt-tryj)<0.5
+            endAt=endAt-tryj;
+            break
+        end
+        tryj=tryj+1;
+    end     
     temp1=temp1(startAt:endAt);
     temp2=temp2(startAt:endAt);
     moveChunks(i,1)=startAt;
@@ -445,15 +471,16 @@ movieframeinds=movieframeinds(~isnan(temp));
 % handles.LEDvals=movie_LED_for_finalalignment;
 
 maxNFramesForLEDtoChange=settings.maxNFramesForLEDtoChange;
-deriv_LEDvals=[diff(handles.LEDvals) 0];
-deriv_thresh=0.2*range(deriv_LEDvals(deriv_LEDvals>=0));
+deriv_LEDvals=[diff(double(formovieframeinds_align)) 0];
+% deriv_LEDvals=[diff(handles.LEDvals) 0];
+deriv_thresh=0.5*range(deriv_LEDvals(deriv_LEDvals>=0));
 % deriv_thresh=(max(handles.LEDvals)/2)/(maxNFramesForLEDtoChange+1);
 [~,peakLocs]=findpeaks(deriv_LEDvals,'MinPeakHeight',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals);
 % peakLocs=locs(pks>deriv_thresh);
 % tooclose=diff(peakLocs);
 % peakLocs=peakLocs(tooclose>=3*maxNFramesForLEDtoChange);
-[~,troughLocs]=findpeaks(-deriv_LEDvals,'MinPeakProminence',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+[~,troughLocs]=findpeaks(-deriv_LEDvals,'MinPeakHeight',deriv_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(-deriv_LEDvals);
 % troughLocs=locs(pks>deriv_thresh);
 % tooclose=diff(troughLocs);
@@ -473,7 +500,10 @@ if movieframeinds_raw(peakLocs(1))>=movieframeinds_raw(troughLocs(1))
     error('Problem in raw LED values -- should always turn on, then off');
 end
 rescaled_thresh=0.5;
-deriv_LEDvals_rescaled=[diff(aligned.movie_distractor) 0];
+temp=aligned.movie_distractor;
+mind=mode(minLEDinterval
+f=findpeaks(
+deriv_LEDvals_rescaled=[diff(double(aligned.movie_distractor>0.5)) 0];
 % rescaled_thresh=0.25*range(deriv_LEDvals_rescaled(deriv_LEDvals_rescaled>=0));
 [~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals_rescaled);
@@ -481,7 +511,7 @@ deriv_LEDvals_rescaled=[diff(aligned.movie_distractor) 0];
 % tooclose=diff(peakLocs_rescaled);
 % peakLocs_rescaled=peakLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
 peakTimes_rescaled=movieframeinds(peakLocs_rescaled);
-[~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakProminence',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
+[~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(-deriv_LEDvals_rescaled);
 % troughLocs_rescaled=locs(pks>rescaled_thresh);
 % tooclose=diff(troughLocs_rescaled);
@@ -495,10 +525,10 @@ else
     troughLocs_rescaled=troughLocs_rescaled(2:end);
     troughTimes_rescaled=troughTimes_rescaled(2:end);
 end
-if length(peakLocs_rescaled)>length(troughLocs_rescaled)
-    peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
-    peakTimes_rescaled=peakTimes_rescaled(1:length(troughLocs_rescaled));
-end
+% if length(peakLocs_rescaled)>length(troughLocs_rescaled)
+%     peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
+%     peakTimes_rescaled=peakTimes_rescaled(1:length(troughLocs_rescaled));
+% end
 k=1;
 donotdoalign=settings.donotdoalign;
 if length(peakLocs_rescaled)~=length(peakLocs)
@@ -608,6 +638,27 @@ plot(aligned.movieframeinds.*(1/moviefps),'Color','b');
 xlabel('Times from movie');
 set(currha,'XTickLabel','');
 % set(currha,'YTickLabel','');
+
+% Plot realigned movieframeinds
+figure();
+plot(aligned.movieframeinds);
+title('Check movieframeinds after secondary alignment');
+
+end
+
+function [movie,arduino]=zeroOutDialog(movie,arduino)
+
+disp('Enter any ranges to zero out in arduino. Enter as vectors in a cell array (e.g., {1:2, 3:4}).');
+s=input('Arduino zero out. Enter here: ');
+for i=1:length(s)
+   arduino(s{i})=0;
+end
+
+disp('Enter any ranges to zero out in movie. Enter as vectors in a cell array (e.g., {1:2, 3:4}).');
+s=input('Movie zero out. Enter here: ');
+for i=1:length(s)
+   movie(s{i})=0;
+end
 
 end
 
