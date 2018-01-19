@@ -218,6 +218,7 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
+if settings.histoDropGrooming==1
     % Find trials when animal was grooming during cue and exclude these
     % trials
     temp=tbt.(nameOfCue);
