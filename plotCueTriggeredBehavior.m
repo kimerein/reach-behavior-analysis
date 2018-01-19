@@ -218,9 +218,13 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
-if settings.histoDropGrooming==1
+% Drop trials when mouse was chewing during cue?
+chewingTrials=[];
+if settings.histoDropGrooming==1 || settings.dropChewingInCue==1
     % Find trials when animal was grooming during cue and exclude these
     % trials
+    % Find trials when mouse was already chewing when cue came on
+    % Exclude these trials
     temp=tbt.(nameOfCue);
     for i=1:size(temp,1)
         cueInd=find(temp(i,:)>0.5,1,'first');
@@ -228,28 +232,21 @@ if settings.histoDropGrooming==1
             % exclude this trial
             groomingTrials=[groomingTrials i];
         end
-    end
-    plot_cues=plot_cues(~ismember(plot_cues,groomingTrials));
-    disp('Excluding from histograms the following trials where mouse was grooming during cue');
-    disp(groomingTrials);
-end
-
-% Drop trials when mouse was chewing during cue?
-chewingTrials=[];
-if settings.dropChewingInCue==1
-    % Find trials when mouse was already chewing when cue came on
-    % Exclude these trials
-    temp=tbt.(nameOfCue);
-    for i=1:size(temp,1)
-        cueInd=find(temp(i,:)>0.5,1,'first');
         if tbt.isChewing(i,cueInd)>0.5 % mouse is chewing during cue
-            % exclude
+            % exclude this trial
             chewingTrials=[chewingTrials i];
         end
     end
-    plot_cues=plot_cues(~ismember(plot_cues,chewingTrials));
-    disp('Excluding from histograms the following trials where mouse was chewing during cue');
-    disp(chewingTrials);
+    if settings.histoDropGrooming==1
+        plot_cues=plot_cues(~ismember(plot_cues,groomingTrials));
+        disp('Excluding from histograms the following trials where mouse was grooming during cue');
+        disp(groomingTrials);
+    end
+    if settings.dropChewingInCue==1
+        plot_cues=plot_cues(~ismember(plot_cues,chewingTrials));
+        disp('Excluding from histograms the following trials where mouse was chewing during cue');
+        disp(chewingTrials);
+    end
 end
 
 % Plot overlap trial-by-trial average

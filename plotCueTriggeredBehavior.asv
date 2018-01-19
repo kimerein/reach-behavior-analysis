@@ -218,7 +218,9 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
-if settings.histoDropGrooming==1
+% Drop trials when mouse was chewing during cue?
+chewingTrials=[];
+if settings.histoDropGrooming==1 
     % Find trials when animal was grooming during cue and exclude these
     % trials
     temp=tbt.(nameOfCue);
@@ -234,8 +236,7 @@ if settings.histoDropGrooming==1
     disp(groomingTrials);
 end
 
-% Drop trials when mouse was chewing during cue?
-chewingTrials=[];
+
 if settings.dropChewingInCue==1
     % Find trials when mouse was already chewing when cue came on
     % Exclude these trials
@@ -247,7 +248,10 @@ if settings.dropChewingInCue==1
             chewingTrials=[chewingTrials i];
         end
     end
-    plotCu
+    plot_cues=plot_cues(~ismember(plot_cues,chewingTrials));
+    disp('Excluding from histograms the following trials where mouse was chewing during cue');
+    disp(chewingTrials);
+end
 
 % Plot overlap trial-by-trial average
 figure();
