@@ -118,7 +118,7 @@ else
     arduino_peakloc=abs(D)+1;
     movie_peak_indexIntoMovie=locs(movie_peakloc);
     arduino_peak_indexIntoArduino=locs_arduino(arduino_peakloc);
-    if (-D)+1+length(movie_LED_ITIs)>=length(locs_arduino)
+    if (-D)+1+length(movie_LED_ITIs)>length(locs_arduino)
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):end));
     else
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):locs_arduino((-D)+1+length(movie_LED_ITIs))));
