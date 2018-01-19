@@ -1,25 +1,11 @@
-function tbt=plotCueTriggeredBehavior(varargin)
-
-if length(varargin)>3
-    data=varargin{1};
-    nameOfCue=varargin{2};
-    excludePawOnWheelTrials=varargin{3};
-    settings=varargin{4};
-else
-    data=varargin{1};
-    nameOfCue=varargin{2};
-    excludePawOnWheelTrials=varargin{3};
-    % Get settings for this analysis
-    settings=plotCueTriggered_settings();
-end
+function plotCueTriggeredExpt(tbt,nameOfCue,excludePawOnWheelTrials)
 
 % nameOfCue should be 'cue' for real cue
 % 'cueZone_onVoff' for cue from movie
 % or 'arduino_distractor' for distractor
 
-% Get cue/data type for triggering trial-by-trial data
-cue=data.(nameOfCue); 
-
+% Get settings for this analysis
+settings=plotCueTriggered_settings();
 % In case of issues with aliasing of instantaneous cue
 maxITI=settings.maxITI; % in seconds, maximal ITI
 minITI=settings.minITI; % in seconds, minimal ITI
@@ -324,8 +310,6 @@ for j=1:length(u)
     legend(plotfields);
     title(settings.trialType_name{j});
 end
-
-tbt=backup_tbt;
 
 end
 
