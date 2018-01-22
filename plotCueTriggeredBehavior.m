@@ -212,6 +212,10 @@ for i=plot_cues
         if ischar(settings.firstN{j})
             if strcmp('all',settings.firstN{j})
                 % plot all events
+                if n>500
+                    event_ind=event_ind(1:10:end);
+                    n=length(event_ind);
+                end
             end
         else
             % plot first n events

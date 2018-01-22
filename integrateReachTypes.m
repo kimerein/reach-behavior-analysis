@@ -17,6 +17,14 @@ alignment=dropReachFromWheel(reaches, alignment, movframes);
 alignment=missReachFromWheel(reaches, alignment, movframes);
 alignment=reachOngoing(reaches, alignment, movframes);
 alignment=lickInitiation(reaches, alignment, movframes);
+alignment=fidgetInitiation(reaches, alignment, movframes);
+
+end
+
+function alignment=fidgetInitiation(reaches, alignment, movframes)
+
+% Initiation of fidget
+alignment.reachFidgetBegins=restructureEvent(reaches.reachFidgetBegins, movframes);
 
 end
 

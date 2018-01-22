@@ -56,7 +56,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
