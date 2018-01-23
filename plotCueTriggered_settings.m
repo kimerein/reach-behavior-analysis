@@ -10,7 +10,7 @@ settings.minITI=2; % in seconds, minimal ITI
 % samples
 % Increase for more stringent cue / pellet presented detection
 % Decrease to pick up more peaks
-% settings.relativePeakHeight=1*10^35; 
+% settings.relativePeakHeight=1*10^35;
 settings.nStdDevs=1; % relative peak height in terms of standard deviations away from mean
 % i.e., greater than nStdDevs * nanstd(data) away from mean
 
@@ -31,7 +31,7 @@ settings.blockITIThresh=[15]; % boundaries between ITI block lengths, in seconds
 
 % Shading colors
 % The indices here correspond to indices into shading_type
-settings.shading_colors={{[0.9 0.9 0.9],'none'}};                        
+settings.shading_colors={{[0.9 0.9 0.9],'none'}};
 
 % How many time points to include from previous trial at the beginning of
 % each trial
@@ -57,7 +57,7 @@ settings.plotfields={'cueZone_onVoff', ...
                      'pelletmissingreach_reachStarts',...
                      'eating'};
 
-                 
+
 % Plotting events:
 
 % Which fields from data to plot as events
@@ -75,7 +75,7 @@ settings.plotevents={'optoZone',...
                      'drop_reachStarts',...
                      'miss_reachStarts',...
                      'cueZone_onVoff'};
-                 
+
 % Color for each event type
 pawwheel_color='y'; % will fill in circle with this color if paw started from wheel for this reach
 % Indices into eventColors and eventOutlines correspond to indices into plotevents
@@ -103,12 +103,12 @@ settings.eventOutlines={'m',...
                         'none',...
                         'none',...
                         'b'};
-                    
+
 % Event thresholds for each event type
 % All indices with data values above the threshold will be counted as events
 % May want to specify different thresholds for each event type
 % Indices into eventThresh correspond to indices into plotevents
-settings.eventThresh={1200,...
+settings.eventThresh={800,...
                       0.5,...
                       0.5,...
                       0.5,...
@@ -119,7 +119,7 @@ settings.eventThresh={1200,...
                       0.2,...
                       0.2,...
                       0.5};
-                  
+
 % Will only plot firstN events of each type in each trial
 % For example, will only plot first moment of cue on in each trial
 % Indices into firstN correspond to indices into plotevents
@@ -135,15 +135,15 @@ settings.firstN={'all',...
                  'all',...
                  'all',...
                  1};
-             
+
 % Width of outline of event maker
 settings.eventLineWidth=1.5;
 
 % Some events, like the cue, are detected as the peak of the resampled cue
 % data. The onset of the cue may precede this peak by a fixed time. All
-% events will be shifted backwards in time by shiftBack seconds, in the figure. 
+% events will be shifted backwards in time by shiftBack seconds, in the figure.
 % For example, if shiftBack is 0.2 for plotevents 'cue', the cue event will be
-% plotted 200 ms earlier. Indices into shiftBack correspond to indices 
+% plotted 200 ms earlier. Indices into shiftBack correspond to indices
 % into plotevents. If in doubt, set shiftBack to zero.
 settings.shiftBack={0,...
                     0,...
@@ -157,14 +157,14 @@ settings.shiftBack={0,...
                     0,...
                     0.2};
 
-                
+
 % Plot histogram of events (or trial-by-trial average), with data types
 % overlapping:
-                
-% Which fields from data to plot as overlapping averaged trial-by-trial 
+
+% Which fields from data to plot as overlapping averaged trial-by-trial
 % List the field names to plot (these are field names from data variable in
 % plotCueTriggeredBehavior.m) in histoplotfields
-% Note that will also shift each event time for each data type by 
+% Note that will also shift each event time for each data type by
 % histoshiftBack
 settings.histoDropGrooming=1; % if 1, will drop all times periods in which mouse was grooming from histograms, otherwise 0
 settings.dropChewingInCue=1; % if 1, will drop all trials when mouse was already chewing during cue
