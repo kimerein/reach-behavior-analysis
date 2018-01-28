@@ -32,6 +32,7 @@ bettermode=mode(timeIncs); % in ms
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
+% if strcmp(nameOfCue,'cueZone_onVoff')
 if strcmp(nameOfCue,'cueZone_onVoff')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
