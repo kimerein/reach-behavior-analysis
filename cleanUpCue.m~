@@ -4,7 +4,7 @@ function aligned=cleanUpCue(aligned)
 
 % This is the fraction of range above the min to use as cut-off threshold
 % for cue on
-thresh=0.7; 
+thresh=0.65ali; 
 
 % If this is 1, subtract off LED distractor, because there is contamination
 % of cue zone from LED distractor

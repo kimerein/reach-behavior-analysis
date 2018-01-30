@@ -10,7 +10,7 @@ settings.discardLastN=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.75;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -31,9 +31,15 @@ settings.movie_dec=1;
 
 % Throw out distractor LED durations in movie or arduino less than this
 % many ms
+<<<<<<< Updated upstream
 % settings.useDistractorThresh=167; % in ms
 settings.useDistractorThresh=175; % in ms
 % settings.useDistractorThresh=160; % in ms
+=======
+settings.useDistractorThresh=200; % in ms
+% settings.useDistractorThresh=175; % in ms
+% settings.useDistractorThresh=165; % in ms
+>>>>>>> Stashed changes
 % settings.useDistractorThresh=150; % in ms
 
 % If, for example, experimenter forget to include LED in movie frame at beginning of
@@ -49,7 +55,7 @@ settings.discardTimeArduinoLED=0; % in seconds
 % the two input signals, arduino_LED and movie_LED
 % maxlag from alignsignals Matlab function
 % Set this to empty array, [], if don't want to constrain initial alignment
-settings.maxlagForInitialAlign=[];
+settings.maxlagForInitialAlign=50;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
@@ -57,7 +63,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -67,7 +73,7 @@ settings.isInSecondHalf=true; % set this to true if movie matches a later sectio
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.5; 
+settings.fractionThroughArduino=0.1; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
