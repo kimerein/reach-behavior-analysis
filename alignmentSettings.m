@@ -67,7 +67,7 @@ settings.isInSecondHalf=true; % set this to true if movie matches a later sectio
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.5; 
+settings.fractionThroughArduino=0.4; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a

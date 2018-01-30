@@ -33,7 +33,11 @@ newDrops=zeros(size(reaches));
 for i=1:length(fi)
     currReachInd=fi(i);
     % is there enough chewing within X seconds of this reach
-    chewInds=sum(chewing(currReachInd:currReachInd+withinXInds)>0.5);
+    if currReachInd+withinXInds>length(chewing)
+        chewInds=sum(chewing(currReachInd:end)>0.5);
+    else
+        chewInds=sum(chewing(currReachInd:currReachInd+withinXInds)>0.5);
+    end
     if chewInds<minIndToPelletChew % not enough chewing to be consistent with eating pellet
         reaches(currReachInd)=0; % not a successful reach
         newDrops(currReachInd)=1; % actually a drop

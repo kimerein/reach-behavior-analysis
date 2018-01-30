@@ -12,7 +12,7 @@ function analyzeReachVideo(videoFile,discardFirstNFrames)
 % plotCueTriggered_settings.m    : how to plot experimental results
 
 endofVfname=regexp(videoFile,'\.');
-endofDir=regexp(videoFile,'/');
+endofDir=regexp(videoFile,'\');
 
 %% Save discardFirstNFrames for rest of analysis
 settings=autoReachAnalysisSettings(discardFirstNFrames);
