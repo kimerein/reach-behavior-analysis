@@ -18,7 +18,7 @@ end
 % or 'arduino_distractor' for distractor
 
 % Get cue/data type for triggering trial-by-trial data
-cue=data.(nameOfCue); 
+cue=data.(nameOfCue);
 
 % In case of issues with aliasing of instantaneous cue
 maxITI=settings.maxITI; % in seconds, maximal ITI
@@ -32,6 +32,7 @@ bettermode=mode(timeIncs); % in ms
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
+% if strcmp(nameOfCue,'cueZone_onVoff')
 if strcmp(nameOfCue,'cueZone_onVoff')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
@@ -220,12 +221,12 @@ for i=plot_cues
         else
             % plot first n events
             n=settings.firstN{j};
-        end    
+        end
         for l=1:n
             scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
                 'MarkerFaceColor',settings.eventColors{j},...
                 'LineWidth',settings.eventLineWidth);
-            hold on; 
+            hold on;
         end       
     end
     k=k+1;
@@ -248,6 +249,7 @@ if settings.histoDropGrooming==1 || settings.dropChewingInCue==1
             groomingTrials=[groomingTrials i];
         end
         if tbt.isChewing(i,cueInd)>0.5 % mouse is chewing during cue
+%         if tbt.isChewing(i,cueInd-5)>0.5 % mouse is chewing during cue
             % exclude this trial
             chewingTrials=[chewingTrials i];
         end
@@ -346,10 +348,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue)); 
+        [~,ma]=max(cue(indsIntoCue));
         cue(indsIntoCue(ma))=max(cue);
     end
-end 
+end
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',peakHeight);
@@ -359,7 +361,7 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan; 
+        cueInds(checkTheseIntervals(i))=nan;
     end
 end
 cueInds=cueInds(~isnan(cueInds));
@@ -385,10 +387,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue)); 
+        [~,ma]=max(cue(indsIntoCue));
         cue(indsIntoCue(ma))=max(cue);
     end
-end 
+end
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',relativePeakHeight);
@@ -398,13 +400,12 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan; 
+        cueInds(checkTheseIntervals(i))=nan;
     end
 end
 cueInds=cueInds(~isnan(cueInds));
 cueIndITIs=diff(cueInds);
 
 cue=cue./nanmax(cue);
- 
-end
 
+end
