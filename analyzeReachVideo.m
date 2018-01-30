@@ -53,6 +53,9 @@ pause;
 [status]=mkdir([videoFile(1:endofVfname(end)-1) '_processed_data']);
 finaldata=integrateSDoutWithReaches(savehandles,out,30,aligned,[videoFile(1:endofVfname(end)-1) '_processed_data']);
 
+%% Check for chewing of pellet (this should take a while -- pellet is large)
+finaldata=checkForChewedPellet(finaldata);
+
 %% Plot results
 tbt=plotCueTriggeredBehavior(finaldata,'cueZone_onVoff',0);
 save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');

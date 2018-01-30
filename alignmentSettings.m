@@ -31,6 +31,7 @@ settings.movie_dec=1;
 
 % Throw out distractor LED durations in movie or arduino less than this
 % many ms
+% settings.useDistractorThresh=167; % in ms
 settings.useDistractorThresh=175; % in ms
 % settings.useDistractorThresh=160; % in ms
 % settings.useDistractorThresh=150; % in ms
