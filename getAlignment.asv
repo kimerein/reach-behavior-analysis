@@ -20,6 +20,8 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
+temp_LED=temp_LED-smooth(temp_LED,51)';
+temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 figure();
@@ -118,7 +120,7 @@ else
     arduino_peakloc=abs(D)+1;
     movie_peak_indexIntoMovie=locs(movie_peakloc);
     arduino_peak_indexIntoArduino=locs_arduino(arduino_peakloc);
-    if (-D)+1+length(movie_LED_ITIs)>=length(locs_arduino)
+    if (-D)+1+length(movie_LED_ITIs)>length(locs_arduino)
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):end));
     else
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):locs_arduino((-D)+1+length(movie_LED_ITIs))));
@@ -144,7 +146,7 @@ plot(X,'Color','b');
 hold on;
 plot(Y,'Color','r');
 title('Preliminary alignment of movie distractor intervals onto arduino distractor intervals');
-legend({'Arduino distractor intervals','Movie distractor intervals'})
+legend({'Arduino distractor intervals','Movie distractor intervals'});
 
 figure();
 plot(arduino_LED,'Color','b');
@@ -501,34 +503,35 @@ if movieframeinds_raw(peakLocs(1))>=movieframeinds_raw(troughLocs(1))
 end
 rescaled_thresh=0.5;
 temp=aligned.movie_distractor;
-mind=mode(minLEDinterval
-f=findpeaks(
-deriv_LEDvals_rescaled=[diff(double(aligned.movie_distractor>0.5)) 0];
+[~,f]=findpeaks(temp,'MinPeakHeight',0.08,'MinPeakDistance',indThresh);
+temp(f)=1;
+deriv_LEDvals_rescaled=[diff(double(temp>0.5)) 0];
 % rescaled_thresh=0.25*range(deriv_LEDvals_rescaled(deriv_LEDvals_rescaled>=0));
 [~,peakLocs_rescaled]=findpeaks(deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(deriv_LEDvals_rescaled);
 % peakLocs_rescaled=locs(pks>rescaled_thresh);
 % tooclose=diff(peakLocs_rescaled);
 % peakLocs_rescaled=peakLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
-peakTimes_rescaled=movieframeinds(peakLocs_rescaled);
+% peakTimes_rescaled=movieframeinds(peakLocs_rescaled);
 [~,troughLocs_rescaled]=findpeaks(-deriv_LEDvals_rescaled,'MinPeakHeight',rescaled_thresh,'MinPeakDistance',3*maxNFramesForLEDtoChange);
 % [pks,locs]=findpeaks(-deriv_LEDvals_rescaled);
 % troughLocs_rescaled=locs(pks>rescaled_thresh);
 % tooclose=diff(troughLocs_rescaled);
 % troughLocs_rescaled=troughLocs_rescaled(tooclose>=3*maxNFramesForLEDtoChange);
-troughTimes_rescaled=movieframeinds(troughLocs_rescaled);
-if peakTimes_rescaled(1)<troughTimes_rescaled(1)
+% troughTimes_rescaled=movieframeinds(troughLocs_rescaled);
+% if peakTimes_rescaled(1)<troughTimes_rescaled(1)
+if peakLocs_rescaled(1)<troughLocs_rescaled(1)
     % LED first increases
 else
     % LED first decreases
     % Throw out first decrease
     troughLocs_rescaled=troughLocs_rescaled(2:end);
-    troughTimes_rescaled=troughTimes_rescaled(2:end);
+%     troughTimes_rescaled=troughTimes_rescaled(2:end);
 end
-% if length(peakLocs_rescaled)>length(troughLocs_rescaled)
-%     peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
+if length(peakLocs_rescaled)>length(troughLocs_rescaled)
+    peakLocs_rescaled=peakLocs_rescaled(1:length(troughLocs_rescaled));
 %     peakTimes_rescaled=peakTimes_rescaled(1:length(troughLocs_rescaled));
-% end
+end
 k=1;
 donotdoalign=settings.donotdoalign;
 if length(peakLocs_rescaled)~=length(peakLocs)

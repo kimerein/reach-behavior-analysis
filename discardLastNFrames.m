@@ -27,4 +27,15 @@ for i=1:length(f)
     end
 end
 
+% Make other fields match
+for i=1:length(f)
+    if islogical(savehandles.(f{i}))
+        % Refers to reaches
+        % Discard values correponding to the discarded reaches
+        temp=savehandles.(f{i});
+        temp=temp(1:length(savehandles.reachStarts));
+        savehandles.(f{i})=temp;
+    end
+end
+
 savehandles.discardLastN=discardLastN;

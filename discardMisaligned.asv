@@ -1,0 +1,17 @@
+function discardMisaligned(tbt,useAsCue)
+
+cue=tbt.(useAsCue);
+
+avcue=nanmean(cue,1);
+[~,maind]=max(avcue);
+
+fi=nan(1,size(cue,1));
+for i=1:size(cue,1)
+    temp=find(cue(i,maind)>0.5,1,'first');
+    % if cue is missing from this trial, drop this trial
+    if isempty(temp)
+        fi(i)=nan;
+    else
+        fi(i)=temp;
+    end
+end

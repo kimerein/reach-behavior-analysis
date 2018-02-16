@@ -20,6 +20,8 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
+temp_LED=temp_LED-smooth(temp_LED,51)';
+temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 figure();
@@ -124,6 +126,10 @@ else
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):locs_arduino((-D)+1+length(movie_LED_ITIs))));
     end
     size_of_movie=length(movie_LED(locs(1):locs(end)));
+%     size_of_movie=length(movie_LED(locs(383-312):locs(403-312)));
+%     size_of_arduino=length(arduino_LED(locs_arduino(383):locs_arduino(403)));
+%     movie_peak_indexIntoMovie=locs(383-312);
+%     arduino_peak_indexIntoArduino=locs_arduino(383);
     guess_best_scale=size_of_arduino/size_of_movie;
     guess_best_scale1=guess_best_scale;
     % Adjust according to guess_best_scale
@@ -144,7 +150,7 @@ plot(X,'Color','b');
 hold on;
 plot(Y,'Color','r');
 title('Preliminary alignment of movie distractor intervals onto arduino distractor intervals');
-legend({'Arduino distractor intervals','Movie distractor intervals'})
+legend({'Arduino distractor intervals','Movie distractor intervals'});
 
 figure();
 plot(arduino_LED,'Color','b');

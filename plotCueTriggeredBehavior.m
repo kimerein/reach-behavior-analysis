@@ -33,7 +33,7 @@ bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
 % if strcmp(nameOfCue,'cueZone_onVoff')
-if strcmp(nameOfCue,'cueZone_onVoff')
+if strcmp(nameOfCue,'cue') | strcmp(nameOfCue,'cueZone_onVoff')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
     [cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode);
@@ -80,7 +80,11 @@ for i=1:length(cueInds)
     elseif i==1
         theseInds=1:cueInds(i+1)-1;
     else
-        theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
+        if cueInds(i)-pointsFromPreviousTrial<0
+            theseInds=1:cueInds(i+1)-1;
+        else
+            theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
+        end
     end
     for j=1:length(f)
         temp=tbt.(f{j});
@@ -94,11 +98,11 @@ for i=1:length(cueInds)
 end
 
 % Zero out nans
-for i=1:length(f)
-    temp=tbt.(f{i});
-    temp(isnan(temp))=0;
-    tbt.(f{i})=temp;
-end
+% for i=1:length(f)
+%     temp=tbt.(f{i});
+%     temp(isnan(temp))=0;
+%     tbt.(f{i})=temp;
+% end
 
 % Get times per trial
 tbt.times=tbt.times-repmat(nanmin(tbt.times,[],2),1,size(tbt.times,2));
@@ -173,7 +177,7 @@ for i=plot_cues
             temp=tbt.(nameOfCue);
             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if isempty(event_ind_pellet)
+            if isempty(event_ind_pellet) || isempty(event_ind_cue)
             elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
@@ -221,6 +225,9 @@ for i=plot_cues
         else
             % plot first n events
             n=settings.firstN{j};
+        end
+        if isempty(event_ind)
+            continue
         end
         for l=1:n
             scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
@@ -284,54 +291,81 @@ for i=1:length(plotfields)
 end
 legend(plotfields);
 
-% Time down-sample tbt
-f=fieldnames(tbt);
-binWins=1:settings.binByN:size(tbt.(f{1}),2);
-temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
-for i=1:length(f)
-    temp=tbt.(f{i});
+if settings.useFixedTimeBins==1
+    % tbt.optoOn=double(tbt.optoZone>settings.eventThresh{1});
+    disp('Started resampling for fixed time bins');
+    % Put tbt into fixed time bins
+    f=fieldnames(tbt);
+    binTimes=settings.binMids;
+    for i=1:length(f)
+        disp(['Resampling ' f{i}]);
+        temp=tbt.(f{i});
+        newTimeTbt_temp=nan(size(temp,1),length(binTimes));
+        for j=1:size(temp,1)
+            temp2=temp(j,:);
+            if isnan(temp2(1))
+                temp2(~isnan(tbt.times(j,:)))=0;
+            end
+            % cut off anything that does not match times
+            temp2(isnan(tbt.times(j,:)))=nan;
+            curr=timeseries(temp2(~isnan(temp2)),tbt.times(j,~isnan(temp2)));
+            res_curr=resample(curr,binTimes);
+            newTimeTbt_temp(j,1:length(res_curr.data))=res_curr.data;
+        end
+        newTimeTbt.(f{i})=newTimeTbt_temp;
+    end
+    disp('Finished resampling for fixed time bins');
+    tbt=newTimeTbt;
+else
+    % Time down-sample tbt
+    f=fieldnames(tbt);
+    binWins=1:settings.binByN:size(tbt.(f{1}),2);
+    temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
+    for i=1:length(f)
+        temp=tbt.(f{i});
+        for j=1:length(binWins)-1
+            temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+        end
+        ds_tbt.(f{i})=temp2;
+    end
+    backup_tbt=tbt;
+    tbt=ds_tbt;
+    new_timespertrial=nan(1,length(binWins)-1);
     for j=1:length(binWins)-1
-        temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+        new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
     end
-    ds_tbt.(f{i})=temp2;
-end
-backup_tbt=tbt;
-tbt=ds_tbt;
-new_timespertrial=nan(1,length(binWins)-1);
-for j=1:length(binWins)-1
-    new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
-end
-timespertrial=new_timespertrial;
-
-% Add together reaches when pellet available, starting from perch
-tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
-
-u=unique(trialTypes);
-u=u(~isnan(u));
-for j=1:length(u)
-    plot_cues=trialTypes==u(j); % Only use trials of this type
-    % Plot overlap trial-by-trial average
-    figure();
-    plotfields=settings.trialType_plotfields;
-    for i=1:length(plotfields)
-        temp=tbt.(plotfields{i});
-        if i==1
-            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
-        else
-            temp2=nansum(temp(plot_cues,:),1);
-%             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
-            plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
+    timespertrial=new_timespertrial;
+    
+    % Add together reaches when pellet available, starting from perch
+    tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
+    
+    u=unique(trialTypes);
+    u=u(~isnan(u));
+    for j=1:length(u)
+        plot_cues=trialTypes==u(j); % Only use trials of this type
+        % Plot overlap trial-by-trial average
+        figure();
+        plotfields=settings.trialType_plotfields;
+        for i=1:length(plotfields)
+            temp=tbt.(plotfields{i});
+            if i==1
+                plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
+            else
+                temp2=nansum(temp(plot_cues,:),1);
+                %             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
+                plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
+            end
+            hold all;
+            if i==1
+                ma=nanmax(nansum(temp(plot_cues,:),1));
+            end
         end
-        hold all;
-        if i==1
-            ma=nanmax(nansum(temp(plot_cues,:),1));
-        end
+        legend(plotfields);
+        title(settings.trialType_name{j});
     end
-    legend(plotfields);
-    title(settings.trialType_name{j});
+    
+    tbt=backup_tbt;
 end
-
-tbt=backup_tbt;
 
 end
 

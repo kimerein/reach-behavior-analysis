@@ -1,20 +1,25 @@
 function tbt=plotCueTriggeredBehavior(varargin)
 
-if 
-data=varargin{1};
-nameOfCue=varargin{2};
-excludePawOnWheelTrials=varargin{3};
-settings=varargin{4};
+if length(varargin)>3
+    data=varargin{1};
+    nameOfCue=varargin{2};
+    excludePawOnWheelTrials=varargin{3};
+    settings=varargin{4};
+else
+    data=varargin{1};
+    nameOfCue=varargin{2};
+    excludePawOnWheelTrials=varargin{3};
+    % Get settings for this analysis
+    settings=plotCueTriggered_settings();
+end
 
 % nameOfCue should be 'cue' for real cue
 % 'cueZone_onVoff' for cue from movie
 % or 'arduino_distractor' for distractor
 
 % Get cue/data type for triggering trial-by-trial data
-cue=data.(nameOfCue); 
+cue=data.(nameOfCue);
 
-% Get settings for this analysis
-settings=plotCueTriggered_settings();
 % In case of issues with aliasing of instantaneous cue
 maxITI=settings.maxITI; % in seconds, maximal ITI
 minITI=settings.minITI; % in seconds, minimal ITI
@@ -27,6 +32,7 @@ bettermode=mode(timeIncs); % in ms
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
+% if strcmp(nameOfCue,'cueZone_onVoff')
 if strcmp(nameOfCue,'cueZone_onVoff')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
@@ -207,16 +213,20 @@ for i=plot_cues
         if ischar(settings.firstN{j})
             if strcmp('all',settings.firstN{j})
                 % plot all events
+                if n>500
+                    event_ind=event_ind(1:10:end);
+                    n=length(event_ind);
+                end
             end
         else
             % plot first n events
             n=settings.firstN{j};
-        end    
+        end
         for l=1:n
             scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
                 'MarkerFaceColor',settings.eventColors{j},...
                 'LineWidth',settings.eventLineWidth);
-            hold on; 
+            hold on;
         end       
     end
     k=k+1;
@@ -239,6 +249,7 @@ if settings.histoDropGrooming==1 || settings.dropChewingInCue==1
             groomingTrials=[groomingTrials i];
         end
         if tbt.isChewing(i,cueInd)>0.5 % mouse is chewing during cue
+%         if tbt.isChewing(i,cueInd-5)>0.5 % mouse is chewing during cue
             % exclude this trial
             chewingTrials=[chewingTrials i];
         end
@@ -273,54 +284,68 @@ for i=1:length(plotfields)
 end
 legend(plotfields);
 
-% Time down-sample tbt
-f=fieldnames(tbt);
-binWins=1:settings.binByN:size(tbt.(f{1}),2);
-temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
-for i=1:length(f)
-    temp=tbt.(f{i});
+if settings.useFixedTimeBins==1
+    disp('Started resampling for fixed time bins');
+    % Put tbt into fixed time bins
+    f=fieldnames(tbt);
+    binTimes=settings.binMids;
+    for i=1:length(f)
+        temp=tbt.(f{i});
+        res_curr=
+        for j=1:size(temp,1)
+            curr=timeseries(temp(j,:),tbt.times(j,:));
+            res_curr=resample(curr,binTimes);
+    end        
+else
+    % Time down-sample tbt
+    f=fieldnames(tbt);
+    binWins=1:settings.binByN:size(tbt.(f{1}),2);
+    temp2=nan(size(tbt.(f{1}),1),length(binWins)-1);
+    for i=1:length(f)
+        temp=tbt.(f{i});
+        for j=1:length(binWins)-1
+            temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+        end
+        ds_tbt.(f{i})=temp2;
+    end
+    backup_tbt=tbt;
+    tbt=ds_tbt;
+    new_timespertrial=nan(1,length(binWins)-1);
     for j=1:length(binWins)-1
-        temp2(:,j)=sum(temp(:,binWins(j):binWins(j+1)-1),2);
+        new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
     end
-    ds_tbt.(f{i})=temp2;
-end
-backup_tbt=tbt;
-tbt=ds_tbt;
-new_timespertrial=nan(1,length(binWins)-1);
-for j=1:length(binWins)-1
-    new_timespertrial(j)=nanmean(timespertrial(binWins(j):binWins(j+1)-1));
-end
-timespertrial=new_timespertrial;
-
-% Add together reaches when pellet available, starting from perch
-tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
-
-u=unique(trialTypes);
-u=u(~isnan(u));
-for j=1:length(u)
-    plot_cues=trialTypes==u(j); % Only use trials of this type
-    % Plot overlap trial-by-trial average
-    figure();
-    plotfields=settings.trialType_plotfields;
-    for i=1:length(plotfields)
-        temp=tbt.(plotfields{i});
-        if i==1
-            plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
-        else
-            temp2=nansum(temp(plot_cues,:),1);
-%             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
-            plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
+    timespertrial=new_timespertrial;
+    
+    % Add together reaches when pellet available, starting from perch
+    tbt.goodReaches=tbt.success_reachStarts+tbt.drop_reachStarts+tbt.miss_reachStarts;
+    
+    u=unique(trialTypes);
+    u=u(~isnan(u));
+    for j=1:length(u)
+        plot_cues=trialTypes==u(j); % Only use trials of this type
+        % Plot overlap trial-by-trial average
+        figure();
+        plotfields=settings.trialType_plotfields;
+        for i=1:length(plotfields)
+            temp=tbt.(plotfields{i});
+            if i==1
+                plot(timespertrial-settings.trialType_shiftBack{i},nansum(temp(plot_cues,:),1)./sum(plot_cues));
+            else
+                temp2=nansum(temp(plot_cues,:),1);
+                %             plot(timespertrial-settings.trialType_shiftBack{i},temp2.*(ma/nanmax(temp2)));
+                plot(timespertrial-settings.trialType_shiftBack{i},temp2./sum(plot_cues));
+            end
+            hold all;
+            if i==1
+                ma=nanmax(nansum(temp(plot_cues,:),1));
+            end
         end
-        hold all;
-        if i==1
-            ma=nanmax(nansum(temp(plot_cues,:),1));
-        end
+        legend(plotfields);
+        title(settings.trialType_name{j});
     end
-    legend(plotfields);
-    title(settings.trialType_name{j});
+    
+    tbt=backup_tbt;
 end
-
-tbt=backup_tbt;
 
 end
 
@@ -337,10 +362,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue)); 
+        [~,ma]=max(cue(indsIntoCue));
         cue(indsIntoCue(ma))=max(cue);
     end
-end 
+end
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',peakHeight);
@@ -350,7 +375,7 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan; 
+        cueInds(checkTheseIntervals(i))=nan;
     end
 end
 cueInds=cueInds(~isnan(cueInds));
@@ -376,10 +401,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue)); 
+        [~,ma]=max(cue(indsIntoCue));
         cue(indsIntoCue(ma))=max(cue);
     end
-end 
+end
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',relativePeakHeight);
@@ -389,13 +414,12 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan; 
+        cueInds(checkTheseIntervals(i))=nan;
     end
 end
 cueInds=cueInds(~isnan(cueInds));
 cueIndITIs=diff(cueInds);
 
 cue=cue./nanmax(cue);
- 
-end
 
+end
