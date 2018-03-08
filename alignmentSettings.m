@@ -5,12 +5,12 @@ function settings=alignmentSettings()
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-settings.discardLastN=11818;
+settings.discardLastN=0;
 
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.45;
+settings.fractionRange=0.3;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -32,10 +32,10 @@ settings.movie_dec=1;
 % Throw out distractor LED durations in movie or arduino less than this
 % many ms
 % settings.useDistractorThresh=180; % in ms
-settings.useDistractorThresh=1; % in ms
+% settings.useDistractorThresh=1; % in ms
 % settings.useDistractorThresh=150; % in ms
 % settings.useDistractorThresh=160; % in ms
-% settings.useDistractorThresh=120; % in ms
+settings.useDistractorThresh=0; % in ms
 
 % If, for example, experimenter forget to include LED in movie frame at beginning of
 % experiment, but Arduino was on, need to discard beginning of arduino
@@ -77,8 +77,8 @@ settings.fractionThroughArduino=0.4;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.05;
-settings.try_scale2=0.05;  
+settings.try_scale1=-0.01;
+settings.try_scale2=0.01;  
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -98,7 +98,7 @@ settings.try_delay2=150;
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
 % settings.alignSegments=1750; % how many indices in each sub-section to independently align
-settings.alignSegments=2500; % how many indices in each sub-section to independently align
+settings.alignSegments=5000; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
@@ -140,7 +140,7 @@ settings.alignWithAllEvents=1;
 settings.doManualZeroOut=0; % 1 if want this user option, 0 otherwise
 
 % Whether to use LED distractor to further align movieframeinds
-settings.donotdoalign=1; % 0 if want further alignment of movieframeinds based on LED distractor, else 1
+settings.donotdoalign=0; % 0 if want further alignment of movieframeinds based on LED distractor, else 1
 
 % How many frames does it take for LED to turn on?
 % This will depend on the movie frame rate

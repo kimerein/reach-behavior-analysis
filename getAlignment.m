@@ -20,8 +20,8 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
-temp_LED=temp_LED-smooth(temp_LED,51)';
-temp_LED=temp_LED-min(temp_LED);
+% temp_LED=temp_LED-smooth(temp_LED,51)';
+% temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 figure();

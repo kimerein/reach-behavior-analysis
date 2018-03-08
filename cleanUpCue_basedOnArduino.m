@@ -1,6 +1,6 @@
 function aligned=cleanUpCue_basedOnArduino(aligned)
 
-minProm=15;
+minProm=100;
 [~,fmovie,widths,proms]=findpeaks(aligned.cueZone,'MinPeakProminence',minProm);
 [~,farduino]=findpeaks(aligned.cue,'MinPeakHeight',0.5);
 usePeak=zeros(size(aligned.cueZone));
@@ -8,8 +8,9 @@ usePeak(isnan(aligned.cueZone))=nan;
 for i=1:length(farduino)
     currArduinoPeak=farduino(i);
     [~,mi]=min(abs(currArduinoPeak-fmovie));
-    for j=1:10
+    for j=1:50
         temp=aligned.cueZone(fmovie(mi)-(j-1))-aligned.cueZone(fmovie(mi)-j);
+        minProm=30;
         if temp>minProm
             break
         end
