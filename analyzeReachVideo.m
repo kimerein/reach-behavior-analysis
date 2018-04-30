@@ -46,7 +46,8 @@ save([videoFile(1:endofVfname(end)-1) '_alignmentSettings.mat'],'settings');
 pause;
 
 %% Clean up cue from movie
-aligned=cleanUpCue(aligned);
+% aligned=cleanUpCue(aligned);
+aligned=cleanUpCue_basedOnArduino(aligned);
 pause;
 
 %% Put Arduino output data and data from video file together
