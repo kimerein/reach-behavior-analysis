@@ -355,8 +355,11 @@ else
     
     u=unique(trialTypes);
     u=u(~isnan(u));
+    backup_plot_cues=plot_cues;
     for j=1:length(u)
-        plot_cues=trialTypes==u(j); % Only use trials of this type
+        plot_cues=backup_plot_cues(trialTypes==u(j)); % Only use trials of this type
+        temp=1:size(tbt.(plotfields{1}),1);
+        plot_cues=ismember(temp,plot_cues);
         % Plot overlap trial-by-trial average
         figure();
         plotfields=settings.trialType_plotfields;

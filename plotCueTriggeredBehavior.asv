@@ -146,12 +146,13 @@ end
 figure(); plot(nanmean(tbt.pelletLoaded,1));
 hold on; plot(nanmean(tbt.cueZone_onVoff,1),'Color','b');
 hold on; plot(nanmean(tbt.pelletPresented,1),'Color','k');
-leg={'pellet loaded',
+leg={'pellet loaded','cue','pellet presented'};
 xlabel('indices');
 ylabel('av');
 title('average across trials');
-ind=input('Enter index showing minimum trial length -- note that any opto within a trial should occur before this index. ');
-if ~isnumeric(ind)
+legend(leg);
+endoftrialind=input('Enter index showing minimum trial length -- note that any opto within a trial should occur before this index. ');
+if ~isnumeric(endoftrialind)
     error('Please enter a number.');
 end
 
@@ -167,16 +168,16 @@ for i=plot_cues
         % Skip this trial
     else
         % Classify trial type based on opto and shading of last trial
-        if any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==1
+        if any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
             % opto and last trial was slow block, i.e., licking
             trialTypes(k)=1; % licking opto
-        elseif ~any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==1
+        elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
             % control and last trial was slow block, i.e., licking
             trialTypes(k)=2; % licking control
-        elseif any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==2
+        elseif any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
             % opto and last trial was fast block, i.e., reaching
             trialTypes(k)=3;
-        elseif ~any(tbt.optoOn(i,:)>0.5) && lastTrialShaded==2
+        elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
             % control and last trial was fast block, i.e., reaching
             trialTypes(k)=4;
         end
@@ -355,6 +356,7 @@ else
     u=unique(trialTypes);
     u=u(~isnan(u));
     for j=1:length(u)
+        plot_cues=plot_cues
         plot_cues=trialTypes==u(j); % Only use trials of this type
         % Plot overlap trial-by-trial average
         figure();

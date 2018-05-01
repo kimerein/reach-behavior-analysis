@@ -5,12 +5,12 @@ function settings=alignmentSettings()
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-settings.discardLastN=4637;
+settings.discardLastN=0;
 
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.55;
+settings.fractionRange=0.152;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -58,7 +58,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -68,7 +68,7 @@ settings.isInSecondHalf=false; % set this to true if movie matches a later secti
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.3; 
+settings.fractionThroughArduino=0.4; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
