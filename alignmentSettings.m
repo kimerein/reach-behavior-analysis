@@ -10,7 +10,7 @@ settings.discardLastN=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.152;
+settings.fractionRange=0.5;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -121,6 +121,7 @@ settings.alignField(5).fromarduino=1;
 % These data types are from movie
 % Note that the names for these should match the names of fields in
 % zoneVals
+% Note that these are referenced in reformatAutoClassifyOutput.m
 settings.alignField(6).name='optoZone';
 settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
@@ -131,6 +132,8 @@ settings.alignField(8).fromarduino=0;
 % settings.alignField(9).fromarduino=0;
 settings.alignField(9).name='isChewing';
 settings.alignField(9).fromarduino=0;
+settings.alignField(10).name='isHold';
+settings.alignField(10).fromarduino=0;
 
 % Whether to add back all LED distractor events (including short ones, on
 % the edge of what movie frame rate can capture) before final alignment

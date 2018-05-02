@@ -117,7 +117,8 @@ if excludePawOnWheelTrials==1
         temp=tbt.(nameOfCue);
         cueInd=find(temp(i,:)>0.5,1,'first');
         pawWasOnWheel=0;
-        if any(tbt.pawOnWheel(i,presentInd:cueInd)>0.5)
+%         if any(tbt.pawOnWheel(i,presentInd:cueInd)>0.5)
+        if any(tbt.reach_ongoing(i,presentInd:cueInd)>0.5) || any(tbt.isHold(i,presentInd:cueInd)>0.5)
             pawWasOnWheel=1;
         else
             plot_cues=[plot_cues i];
@@ -137,6 +138,9 @@ ha=tight_subplot(length(plotfields),1,[0.06 0.03],[0.05 0.05],[0.1 0.03]);
 for i=1:length(plotfields)
     currha=ha(i);
     axes(currha);
+    if ~isfield(tbt,plotfields{i})
+        error([plotfields{i} ' field absent from tbt. See plotCueTriggered_settings.m to specify fields to plot.']);
+    end
     temp=tbt.(plotfields{i});
     plot(timespertrial,nanmean(temp(plot_cues,:),1));
     title(plotfields{i},'Interpreter','none');
@@ -224,6 +228,9 @@ for i=plot_cues
         end
     end
     for j=1:length(plotfields)
+        if ~isfield(tbt,plotfields{j})
+            error([plotfields{j} ' field absent from tbt. See plotCueTriggered_settings.m to specify fields to plot.']);
+        end
         currEvents=tbt.(plotfields{j});
         event_thresh=settings.eventThresh{j};
         event_ind=find(currEvents(i,:)>event_thresh);

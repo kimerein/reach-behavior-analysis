@@ -47,7 +47,7 @@ for i=1:length(fi)
         reaches(currReachInd)=0; % not a successful reach
         newDrops(currReachInd)=1; % actually a drop
     end
-    if dropIfChewingBefore==1 && newDrops(currReachInd)==0
+    if dropIfChewingBefore==1
         % was mouse chewing BEFORE reach?
         if currReachInd-priorXInds<1
             chewInds_before=sum(chewing(1:currReachInd-1)>0.5);
@@ -58,12 +58,17 @@ for i=1:length(fi)
             % mouse was chewing before reach
             % did mouse chew long enough after reach, consistent with
             % consumption of full pellet?
-            if chewInds<minIndMoreStringent % not enough chewing to be consistent with eating pellet
-                reaches(currReachInd)=0; % not a successful reach
-                newDrops(currReachInd)=1; % actually a drop
-            end
-        end
-    end
+            if chewInds
 end
+
+
+
+settings.chew.minTimeToChewPellet=6; % in seconds, the minimum time it takes mouse to eat pellet (e.g., vs chewing Ensure)
+settings.chew.withinXSeconds=20; % must be at least minTimeToChewPellet seconds of chewing withinXSeconds for bout to be classified as chewing pellet
+settings.chew.dropIfChewingBefore=1; % if 1, will classify a reach as a drop, instead of a success, 
+% if mouse was chewing prior to reach (i.e., still consuming previous pellet)
+% AND chew time following reach is less than minTimeToChew_afterReach
+settings.chew.minTimeToChew_afterReach=10; % in seconds, a more stringent criterion for pellet consumption time, to disambiguate 
+% continued chewing of previous pellet after failed reach from successful reach
 
 end

@@ -1,10 +1,12 @@
-function aligned=getAlignment(out,moviefps,handles)
+function aligned=getAlignment(out,moviefps,handles,settings)
 
 % Note that microSD (Arduino) output is timed in ms
 % Whereas video is timed in frames per sec
 
 % Get settings for alignment
-settings=alignmentSettings();
+if isempty(settings)
+    settings=alignmentSettings();
+end
 
 % Remove incomplete reach detections
 isnotnaninds=~isnan(mean([handles.reachStarts' handles.pelletTime' handles.eatTime' handles.pelletMissing'],2));

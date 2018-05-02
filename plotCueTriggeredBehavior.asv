@@ -117,7 +117,8 @@ if excludePawOnWheelTrials==1
         temp=tbt.(nameOfCue);
         cueInd=find(temp(i,:)>0.5,1,'first');
         pawWasOnWheel=0;
-        if any(tbt.pawOnWheel(i,presentInd:cueInd)>0.5)
+%         if any(tbt.pawOnWheel(i,presentInd:cueInd)>0.5)
+        if any(tbt.reach_ongoing(i,presentInd:cueInd)>0.5) | any(tbt.isHold(i,presentInd:cueInd)>0.5)
             pawWasOnWheel=1;
         else
             plot_cues=[plot_cues i];
@@ -355,9 +356,11 @@ else
     
     u=unique(trialTypes);
     u=u(~isnan(u));
+    backup_plot_cues=plot_cues;
     for j=1:length(u)
-        plot_cues=plot_cues
-        plot_cues=trialTypes==u(j); % Only use trials of this type
+        plot_cues=backup_plot_cues(trialTypes==u(j)); % Only use trials of this type
+        temp=1:size(tbt.(plotfields{1}),1);
+        plot_cues=ismember(temp,plot_cues);
         % Plot overlap trial-by-trial average
         figure();
         plotfields=settings.trialType_plotfields;
