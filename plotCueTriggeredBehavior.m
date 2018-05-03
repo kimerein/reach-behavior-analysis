@@ -29,6 +29,7 @@ timeIncs=diff(data.timesfromarduino(data.timesfromarduino~=0));
 mo=mode(timeIncs);
 timeIncs(timeIncs==mo)=nan;
 bettermode=mode(timeIncs); % in ms
+% bettermode=mo;
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
