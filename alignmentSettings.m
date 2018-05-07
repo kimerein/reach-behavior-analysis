@@ -134,6 +134,8 @@ settings.alignField(9).name='isChewing';
 settings.alignField(9).fromarduino=0;
 settings.alignField(10).name='isHold';
 settings.alignField(10).fromarduino=0;
+settings.alignField(11).name='pelletPresent';
+settings.alignField(11).fromarduino=0;
 
 % Whether to add back all LED distractor events (including short ones, on
 % the edge of what movie frame rate can capture) before final alignment

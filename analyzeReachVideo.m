@@ -47,9 +47,7 @@ pause;
 
 %% Clean up cue from movie
 % aligned=cleanUpCue(aligned);
-aligned=cleanUpCue_basedOnArduino(aligned);
-cleanup.minProm=aligned.minProm;
-cleanup.minProm2=aligned.minProm2;
+[aligned,cleanup]=cleanUpCue_basedOnArduino(aligned);
 save([videoFile(1:endofVfname(end)-1) '_cleanup_settings.mat'], 'cleanup');
 pause;
 

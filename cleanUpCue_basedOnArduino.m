@@ -1,11 +1,11 @@
-function aligned=cleanUpCue_basedOnArduino(aligned)
+function [aligned,settings]=cleanUpCue_basedOnArduino(aligned)
 
 % minProm=30;
 % minProm2=10;
 minProm=200;
 minProm2=100;
-aligned.minProm=minProm;
-aligned.minProm2=minProm2;
+settings.minProm=minProm;
+settings.minProm2=minProm2;
 
 % minProm=0.5;
 % minProm2=0.5;

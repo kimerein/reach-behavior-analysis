@@ -34,7 +34,7 @@ bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
 % if strcmp(nameOfCue,'cueZone_onVoff')
-if strcmp(nameOfCue,'cue') | strcmp(nameOfCue,'cueZone_onVoff')
+if strcmp(nameOfCue,'cue') | strcmp(nameOfCue,'cueZone_onVoff') | strcmp(nameOfCue,'falseCueOn')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
     [cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode);
