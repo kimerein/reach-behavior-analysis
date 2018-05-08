@@ -738,7 +738,7 @@ function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,
 % If like movie, scaleThisSignal=1
 % else scaleThisSignal=0
 
-signal=decimate(signal,decind);
+signal=decimate(double(signal),decind);
 if scaleThisSignal==1
     % Like movie 
     % From initial alignment
