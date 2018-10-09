@@ -10,7 +10,7 @@ settings.discardLastN=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.7;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds

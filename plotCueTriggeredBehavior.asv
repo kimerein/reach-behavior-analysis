@@ -17,24 +17,6 @@ end
 % 'cueZone_onVoff' for cue from movie
 % or 'arduino_distractor' for distractor
 
-% Make movie distractor only the START of movie distractor -- change to
-% instantaneous
-if strcmp(nameOfCue,'movie_distractor')
-    f=data.movie_distractor>0.5;
-    fstarts=find(diff(f)==1);
-    fstarts=fstarts+1;
-    temp=zeros(size(data.movie_distractor));
-    temp(fstarts)=1;
-    figure();
-    plot(data.movie_distractor);
-    hold all;
-    plot(temp);
-    legend({'movie distractor raw','get beginnings'});
-    title('getting beginning of movie distractor');
-    temp(isnan(data.movie_distractor))=nan;
-    data.movie_distractor=temp;
-end
-
 % Get cue/data type for triggering trial-by-trial data
 cue=data.(nameOfCue);
 
@@ -49,6 +31,17 @@ timeIncs(timeIncs==mo)=nan;
 bettermode=mode(timeIncs); % in ms
 % bettermode=mo;
 bettermode=bettermode/1000; % in seconds
+
+% Make movie distractor only the START of movie distractor -- change to
+% instantaneous
+if strcmp(nameOfCue,'movie_distractor')
+    for i=1:size(out.movie_distractor,1)
+        temp=zeros(size(out.cueOn(i,:)));
+        temp(isnan(out.cueOn(i,:)))=nan;
+        temp(find(out.cueOn(i,:)>0.5,1,'first'))=1;
+        out.cueOn(i,:)=temp;
+    end
+end
 
 % Fix aliasing issues with resampled data
 % if strcmp(nameOfCue,'cueZone_onVoff')
