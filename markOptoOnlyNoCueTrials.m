@@ -20,6 +20,15 @@ pelletPresented=alignment.pelletPresented;
 pelletLoaded=alignment.pelletLoaded;
 optoOn=alignment.optoOn;
 cue=alignment.cue;
+
+f=optoOn>0.5;
+fstarts=find(diff(f)==1);
+fstarts=fstarts+1;
+temp=zeros(size(optoOn));
+temp(fstarts)=1;
+temp(isnan(optoOn))=nan;
+optoOn=temp;
+
 [~,loads]=findpeaks(pelletLoaded,'MinPeakProminence',event_thresh);
 [~,presents]=findpeaks(pelletPresented,'MinPeakProminence',event_thresh);
 [~,cues]=findpeaks(cue,'MinPeakProminence',event_thresh);
