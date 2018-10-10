@@ -7,10 +7,13 @@ function settings=alignmentSettings()
 % Discard the last N frames of the movie where N is discardLastN
 settings.discardLastN=0;
 
+% Is this running on Harvard server, automatically? If yes, set to 1
+settings.isOrchestra=1;
+
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.7;
+settings.fractionRange=0.6;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds

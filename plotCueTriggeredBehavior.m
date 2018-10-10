@@ -33,6 +33,32 @@ if strcmp(nameOfCue,'movie_distractor')
     title('getting beginning of movie distractor');
     temp(isnan(data.movie_distractor))=nan;
     data.movie_distractor=temp;
+elseif strcmp(nameOfCue,'optoOnly')
+    f=data.optoOnly>0.5;
+    fstarts=find(diff(f)==1);
+    fstarts=fstarts+1;
+    temp=zeros(size(data.optoOnly));
+    temp(fstarts)=1;
+    figure();
+    plot(data.optoOnly);
+    hold all;
+    plot(temp);
+    legend({'optoOnly raw','get beginnings'});
+    title('getting beginning of optoOnly');
+    temp(isnan(data.optoOnly))=nan;
+    data.optoOnly=temp;
+end
+
+% If running automatically on Harvard server, do not use manual optoZone
+% threshold
+if settings.isOrchestra==1 & isfield(data,'optoZone')
+    threshForOnVsOff=min(data.optoZone)+settings.fractionRange*range(data.optoZone);
+    for i=1:length(settings.plotevents)
+        if strcmp(settings.plotevents{i},'optoZone')
+            settings.eventThresh{i}=threshForOnVsOff;
+            break
+        end
+    end
 end
 
 % Get cue/data type for triggering trial-by-trial data
@@ -52,7 +78,7 @@ bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
 % if strcmp(nameOfCue,'cueZone_onVoff')
-if strcmp(nameOfCue,'cue') | strcmp(nameOfCue,'cueZone_onVoff') | strcmp(nameOfCue,'falseCueOn') | strcmp(nameOfCue,'movie_distractor')
+if strcmp(nameOfCue,'cue') | strcmp(nameOfCue,'cueZone_onVoff') | strcmp(nameOfCue,'falseCueOn') | strcmp(nameOfCue,'movie_distractor') | strcmp(nameOfCue,'optoOnly')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
     [cue,cueInds,cueIndITIs]=fixAliasing(cue,maxITI,minITI,bettermode);
@@ -166,17 +192,21 @@ for i=1:length(plotfields)
 end
 
 % Ask user when min trial ends based on distribution of wheel turn times
-figure(); plot(nanmean(tbt.pelletLoaded,1));
-hold on; plot(nanmean(tbt.cueZone_onVoff,1),'Color','b');
-hold on; plot(nanmean(tbt.pelletPresented,1),'Color','k');
-leg={'pellet loaded','cue','pellet presented'};
-xlabel('indices');
-ylabel('av');
-title('average across trials');
-legend(leg);
-endoftrialind=input('Enter index showing minimum trial length -- note that any opto within a trial should occur before this index. ');
-if ~isnumeric(endoftrialind)
-    error('Please enter a number.');
+if settings.isOrchestra~=1
+    figure(); plot(nanmean(tbt.pelletLoaded,1));
+    hold on; plot(nanmean(tbt.cueZone_onVoff,1),'Color','b');
+    hold on; plot(nanmean(tbt.pelletPresented,1),'Color','k');
+    leg={'pellet loaded','cue','pellet presented'};
+    xlabel('indices');
+    ylabel('av');
+    title('average across trials');
+    legend(leg);
+    endoftrialind=input('Enter index showing minimum trial length -- note that any opto within a trial should occur before this index. ');
+    if ~isnumeric(endoftrialind)
+        error('Please enter a number.');
+    end
+else
+    endoftrialind=250;
 end
 
 % Also plot experiment as events in a scatter plot
