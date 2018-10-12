@@ -10,6 +10,9 @@
 % arduinoSettings.m              : parse Arduino output data
 % plotCueTriggered_settings.m    : how to plot experimental results
 
+addpath(genpath('reachBehavior'));
+addpath(genpath('reach_behavior_analysis'));
+
 % Load data
 f=dir(pwd);
 j=1;
