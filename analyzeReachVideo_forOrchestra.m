@@ -12,6 +12,7 @@
 
 addpath(genpath('reachBehavior'));
 addpath(genpath('reach_behavior_analysis'));
+disp('added to path');
 
 % Load data
 f=dir(pwd);
@@ -19,7 +20,7 @@ j=1;
 movie_names=[];
 for i=1:length(f)
     currname=f(i).name;
-    if ~isempty(regexp(currname,'.AVI', 'once'))
+    if ~isempty(regexp(currname,'\.avi', 'once'))
         % is movie file
         movie_names{j}=currname;
         j=j+1;
@@ -29,9 +30,9 @@ end
 % For each movie file ... process with default settings
 for i=1:length(movie_names)
     videoFile=movie_names{i};
-    videoFile=[pwd '\' videoFile];
+    videoFile=[pwd '/' videoFile];
     endofVfname=regexp(videoFile,'\.');
-    endofDir=regexp(videoFile,'\');
+    endofDir=regexp(videoFile,'/');
     
     % Read in autoReachAnalysisSettings
     a=load([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat']);
@@ -45,7 +46,7 @@ for i=1:length(movie_names)
     save([videoFile(1:endofVfname(end)-1) '_savehandles.mat'],'savehandles');
     
     % Get Arduino output data
-    out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
+    out=parseSerialOut_wrapper([videoFile(1:endofVfname(end)-1) '_OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
     settings=arduinoSettings();
     save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
     

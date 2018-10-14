@@ -28,7 +28,7 @@ save([videoFile(1:endofVfname(end)-1) '_setupReachSettings.mat'],'settings');
 % (will use OpenCV in Python to read in video file)
 a=load([videoFile(1:endofVfname(end)-1) '_zones.mat']);
 zones=a.zones;
-fid=fopen([videoFile(1:endofVfname(end)-1) '_zonesAsText.txt'],'wt');
+fid=fopen([videoFile(1:endofVfname(end)-1) '_zonesAsText.txt'],'w');
 for i=1:length(zones)
     takeImageValue=zones(i).takeImageValue;
     isin=zones(i).isin;
@@ -45,6 +45,7 @@ for i=1:length(zones)
             tuplesString=[tuplesString [thisTuple ',']];
         end
     end
-    fprintf(fid,'%s %s\n\n',takeImageValue,tuplesString);
+    fprintf(fid,'%s %s\n',takeImageValue,tuplesString);
 end
-fclose(fid);   
+fclose(fid); 
+    

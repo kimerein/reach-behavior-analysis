@@ -80,8 +80,7 @@ for i=1:length(zones)
     currZone=getZone(zones(i).prompt, zones(i).name, allframes(:,:,:,currentFrameNumber));
     [cols,rows]=find(ones(size(allframes,1),size(allframes,2))>0);
     zones(i).isin=inpolygon(rows,cols,currZone(:,1),currZone(:,2));
-    zones(i).dim1points=rows;
-    zones(i).dim2points=cols;
+    zones(i).rowInds=
 end
 
 % Save zones
