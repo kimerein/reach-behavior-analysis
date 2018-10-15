@@ -55,15 +55,11 @@ for i=1:length(movie_names)
     while cline~=-1
         % is -1 at eof
         a=eval(['[' cline ']']);
-        if isempty(a)
-            break
-        end
         dataForZoneVals(j,:)=a;
         j=j+1;
-        cline=fgetl(fid);
     end
     for j=1:size(dataForZoneVals,2)
-        zoneVals.(zones(j).analysisField)=dataForZoneVals(:,j)';
+        zoneVals.(zones(j).name)=dataForZoneVals(:,j)';
     end
     save([videoFile(1:endofVfname(end)-1) '_zoneVals.mat'],'zoneVals');
         
