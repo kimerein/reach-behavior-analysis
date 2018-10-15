@@ -2,8 +2,9 @@ function [aligned,settings]=cleanUpCue_basedOnArduino(aligned)
  
 % minProm=30;
 % minProm2=10;
-minProm=100;
-minProm2=20;
+
+minProm=prctile(aligned.cueZone,95)-prctile(aligned.cueZone,40);
+minProm2=prctile(aligned.cueZone,60)-prctile(aligned.cueZone,20);
 settings.minProm=minProm;
 settings.minProm2=minProm2;
 
