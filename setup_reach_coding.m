@@ -59,6 +59,8 @@ fig.Parent.Position=[100 100 800 800];
 pause;
 if ~isempty(regexp(version,'2017b','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
+elseif ~isempty(regexp(version,'2018a','once'))
+    currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
 end
