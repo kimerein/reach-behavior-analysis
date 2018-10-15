@@ -19,7 +19,7 @@ for i=1:length(f)
         temp=savehandles.(f{i});
         temp(lastNotNan-discardLastN+1:lastNotNan)=nan;
         savehandles.(f{i})=temp;
-    elseif ~ischar(savehandles.(f{i}))
+    elseif ~islogical(savehandles.(f{i})) & ~ischar(savehandles.(f{i}))
         % Event refer to inds
         temp=savehandles.(f{i});
         temp=temp(~(temp>=lastNFrames(1) & temp<=lastNFrames(end)));

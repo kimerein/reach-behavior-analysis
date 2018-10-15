@@ -59,8 +59,6 @@ fig.Parent.Position=[100 100 800 800];
 pause;
 if ~isempty(regexp(version,'2017b','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
-elseif ~isempty(regexp(version,'2018a','once'))
-    currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
 end
@@ -82,8 +80,7 @@ for i=1:length(zones)
     currZone=getZone(zones(i).prompt, zones(i).name, allframes(:,:,:,currentFrameNumber));
     [cols,rows]=find(ones(size(allframes,1),size(allframes,2))>0);
     zones(i).isin=inpolygon(rows,cols,currZone(:,1),currZone(:,2));
-    zones(i).dim1points=rows;
-    zones(i).dim2points=cols;
+    zones(i).rowInds=
 end
 
 % Save zones

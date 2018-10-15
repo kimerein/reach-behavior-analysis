@@ -43,11 +43,12 @@ aligned=getAlignment(out,30,savehandles,[]);
 save([videoFile(1:endofVfname(end)-1) '_aligned.mat'],'aligned');
 settings=alignmentSettings();
 save([videoFile(1:endofVfname(end)-1) '_alignmentSettings.mat'],'settings');
+aligned2=aligned;
 pause;
 
 %% Clean up cue from movie
 % aligned=cleanUpCue(aligned);
-[aligned,cleanup]=cleanUpCue_basedOnArduino(aligned);
+[aligned,cleanup]=cleanUpCue_basedOnArduino(aligned2);
 save([videoFile(1:endofVfname(end)-1) '_cleanup_settings.mat'], 'cleanup');
 pause;
 

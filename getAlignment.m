@@ -26,7 +26,7 @@ temp_LED=temp_LED(~isnan(temp_LED));
 % temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
-figure();
+figz(1)=figure();
 movie_times=0:(1/moviefps)*1000:(length(temp_LED)-1)*((1/moviefps)*1000);
 plot(movie_times,temp_LED,'Color','b');
 hold on;
@@ -147,14 +147,14 @@ else
     tryscales=guess_best_scale+settings.try_scale1:tryinc:guess_best_scale+settings.try_scale2;
 end
 
-figure();
+figz(2)=figure();
 plot(X,'Color','b');
 hold on;
 plot(Y,'Color','r');
 title('Preliminary alignment of movie distractor intervals onto arduino distractor intervals');
 legend({'Arduino distractor intervals','Movie distractor intervals'});
 
-figure();
+figz(3)=figure();
 plot(arduino_LED,'Color','b');
 hold on;
 plot([nan(1,guess_best_delay) movie_LED],'Color','r');
@@ -162,8 +162,10 @@ title('Preliminary alignment of movie distractor onto arduino distractor');
 legend({'Arduino distractor','Movie distractor'});
 
 % Wait for user to confirm preliminary alignment
-pause;
-
+if settings.isOrchestra~=1
+    pause;
+end
+ 
 % Test signal alignment and scaling
 disp('Now refining alignment ...');
 sumdiffs=nan(length(tryscales),length(trydelays));
@@ -177,13 +179,14 @@ if settings.alignWithAllEvents==1
     backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     throwOutMovie=interp(throwOutMovie,movie_dec);
     movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
-    figure(); 
+    figz(4)=figure(); 
     plot(allEvents_movie_LED,'Color','b'); 
     hold on; 
     plot(movie_LED_for_finalalignment,'Color','r');
     legend({'before removal','after removal'});
     title('Remove short, skipped frame LED distractors before alignment');
 else
+    figz(4)=figure;
     backup_movie_LED=movie_LED;
     forSecondaryAlignment=backup_movie_LED;
     backup_arduino_LED=arduino_LED;
@@ -221,7 +224,7 @@ sumdiffs(isnan(sumdiffs))=3*ma;
 [minval,mi]=min(sumdiffs(:));
 [mi_row,mi_col]=ind2sub(size(sumdiffs),mi);
 
-figure(); 
+figz(5)=figure(); 
 imagesc(sumdiffs);
 title('Finding best alignment');
 xlabel('Trying different delays');
@@ -243,7 +246,7 @@ movieToLength=length(best_arduino);
 if length(best_arduino)>length(best_movie)
     best_movie=[best_movie nan(1,length(best_arduino)-length(best_movie))];
 end
-figure();
+figz(6)=figure();
 plot(best_movie,'Color','r');
 hold on;
 plot(best_arduino,'Color','b');
@@ -361,7 +364,7 @@ for i=1:length(segmentInds)-1
     mov_distractor=[mov_distractor temp1];
     arduino_distractor=[arduino_distractor temp2];
 end
-figure();
+figz(7)=figure();
 plot(mov_distractor,'Color','r');
 hold on;
 plot(arduino_distractor,'Color','b');
@@ -402,7 +405,7 @@ for i=fi:length(arduino_distractor)
     end
 end
 aligned.arduino_distractor=arduino_distractor;
-figure();
+figz(8)=figure();
 plot(mov_distractor,'Color','r');
 hold on;
 plot(arduino_distractor,'Color','b');
@@ -594,7 +597,7 @@ else
 end
 
 % Plot results
-figure();
+figz(9)=figure();
 ha=tight_subplot(7,1,[0.06 0.03],[0.08 0.1],[0.1 0.01]);
 currha=ha(1);
 axes(currha);
@@ -649,9 +652,15 @@ set(currha,'XTickLabel','');
 % set(currha,'YTickLabel','');
 
 % Plot realigned movieframeinds
-figure();
+figz(10)=figure();
 plot(aligned.movieframeinds);
 title('Check movieframeinds after secondary alignment');
+
+if settings.isOrchestra==1
+    endofVfname=regexp(handles.filename,'\.');
+    savefig(figz,[handles.filename(1:endofVfname(end)-1) '_alignmentFigs.fig'],'compact');
+    close all
+end
 
 end
 

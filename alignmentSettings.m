@@ -7,10 +7,13 @@ function settings=alignmentSettings()
 % Discard the last N frames of the movie where N is discardLastN
 settings.discardLastN=0;
 
+% Is this running on Harvard server, automatically? If yes, set to 1
+settings.isOrchestra=0;
+
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.30;
+settings.fractionRange=0.53;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -58,7 +61,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -98,7 +101,9 @@ settings.try_delay2=150;
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
 % settings.alignSegments=1750; % how many indices in each sub-section to independently align
+
 settings.alignSegments=20000; % between 10,000 and 20,000 -- how many indices in each sub-section to independently align
+
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 

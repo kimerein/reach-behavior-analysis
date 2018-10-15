@@ -14,7 +14,7 @@ subtractDistract=1;
 cueZone=aligned.cueZone;
 if subtractDistract==1
     mi=min(cueZone);
-    cueZone=cueZone-(range(cueZone)*aligned.movie_distractor);
+    cueZone=cueZone-(0.01*range(cueZone)*aligned.movie_distractor);
     cueZone(cueZone<mi)=mi;
 end
 
