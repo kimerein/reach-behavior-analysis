@@ -71,7 +71,7 @@ settings.isInSecondHalf=false; % set this to true if movie matches a later secti
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.3; 
+settings.fractionThroughArduino=0.6; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -101,7 +101,9 @@ settings.try_delay2=150;
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
 % settings.alignSegments=1750; % how many indices in each sub-section to independently align
-settings.alignSegments=20000; % how many indices in each sub-section to independently align
+
+settings.alignSegments=20000; % between 10,000 and 20,000 -- how many indices in each sub-section to independently align
+
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 

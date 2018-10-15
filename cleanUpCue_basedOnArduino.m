@@ -2,8 +2,10 @@ function [aligned,settings]=cleanUpCue_basedOnArduino(aligned)
  
 % minProm=30;
 % minProm2=10;
-minProm=100;
-minProm2=20;
+
+minProm=60; % peak must be this much higher than neighboring trace
+minProm2=30; % will stop at first data point this much higher than neighbor
+
 settings.minProm=minProm;
 settings.minProm2=minProm2;
 
