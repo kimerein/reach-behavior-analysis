@@ -26,6 +26,12 @@ temp_LED=temp_LED(~isnan(temp_LED));
 % temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
+
+% Check for single points above thresh -- LED duration is more than 1 frame
+isGreater=temp_LED>threshForOnVsOff;
+justOnePoint=[diff(isGreater(1:2))==-1 diff(isGreater(1:end-1))==1 & diff(isGreater(2:end))==-1];
+temp_LED(justOnePoint)=threshForOnVsOff-1;
+
 figz(1)=figure();
 movie_times=0:(1/moviefps)*1000:(length(temp_LED)-1)*((1/moviefps)*1000);
 plot(movie_times,temp_LED,'Color','b');
@@ -544,9 +550,11 @@ end
 k=1;
 donotdoalign=settings.donotdoalign;
 if length(peakLocs_rescaled)~=length(peakLocs)
-    disp('May be a problem: different numbers of LED distractor flashes during alignment of movieframeinds');
+    fortitle='May be a problem: different numbers of LED distractor flashes during alignment of movieframeinds';
+    disp(fortitle);
 else
-    disp('Good: matching LED distractor flashes during alignment of movieframeinds');
+    fortitle='Good: matching LED distractor flashes during alignment of movieframeinds';
+    disp(fortitle);
 end
 for i=1:length(peakLocs)
     up=movieframeinds_raw(peakLocs(i));
@@ -654,7 +662,7 @@ set(currha,'XTickLabel','');
 % Plot realigned movieframeinds
 figz(10)=figure();
 plot(aligned.movieframeinds);
-title('Check movieframeinds after secondary alignment');
+title(fortitle);
 
 if settings.isOrchestra==1
     endofVfname=regexp(handles.filename,'\.');
