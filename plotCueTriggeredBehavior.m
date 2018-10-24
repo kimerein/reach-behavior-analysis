@@ -215,99 +215,99 @@ k=1;
 plotfields=settings.plotevents;
 lastTrialShaded=0;
 trialTypes=nan(1,length(plot_cues));
-for i=plot_cues
-    % Classify this trial type
-    if (k==1 && settings.excludeFirstTrial==1) || (lastTrialShaded==0)
-        % Skip this trial
-    else
-        % Classify trial type based on opto and shading of last trial
-        if any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
-            % opto and last trial was slow block, i.e., licking
-            trialTypes(k)=1; % licking opto
-        elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
-            % control and last trial was slow block, i.e., licking
-            trialTypes(k)=2; % licking control
-        elseif any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
-            % opto and last trial was fast block, i.e., reaching
-            trialTypes(k)=3;
-        elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
-            % control and last trial was fast block, i.e., reaching
-            trialTypes(k)=4;
-        end
-    end
-    if ~isempty(settings.shading_type)
-        % Shade some trials
-        if ismember('ITI',settings.shading_type)
-            % Shade trials according to ITI lengths
-            shades=settings.shading_colors{find(ismember(settings.shading_type,'ITI'))};
-            event_thresh=0.5;
-            temp=tbt.(nameOfCue);
-            event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
-            event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if isempty(event_ind_pellet) || isempty(event_ind_cue)
-            elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
-            elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
-                % Fast block
-                lastTrialShaded=2;
-                if strcmp(shades{2},'none')
-                else
-                    line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
-                end
-            else
-                % Slow block
-                lastTrialShaded=1;
-                if strcmp(shades{1},'none')
-                else
-                    line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
-                end
-            end
-%             elseif (timespertrial(event_ind_pellet(end))-timespertrial(event_ind_cue))>settings.blockITIThresh
-%                 % Slow block
-%                 if strcmp(shades{1},'none')
-%                 else
-%                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
-%                 end
-%             else
+% for i=plot_cues
+%     % Classify this trial type
+%     if (k==1 && settings.excludeFirstTrial==1) || (lastTrialShaded==0)
+%         % Skip this trial
+%     else
+%         % Classify trial type based on opto and shading of last trial
+%         if any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
+%             % opto and last trial was slow block, i.e., licking
+%             trialTypes(k)=1; % licking opto
+%         elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==1
+%             % control and last trial was slow block, i.e., licking
+%             trialTypes(k)=2; % licking control
+%         elseif any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
+%             % opto and last trial was fast block, i.e., reaching
+%             trialTypes(k)=3;
+%         elseif ~any(tbt.optoOn(i,1:endoftrialind)>0.5) && lastTrialShaded==2
+%             % control and last trial was fast block, i.e., reaching
+%             trialTypes(k)=4;
+%         end
+%     end
+%     if ~isempty(settings.shading_type)
+%         % Shade some trials
+%         if ismember('ITI',settings.shading_type)
+%             % Shade trials according to ITI lengths
+%             shades=settings.shading_colors{find(ismember(settings.shading_type,'ITI'))};
+%             event_thresh=0.5;
+%             temp=tbt.(nameOfCue);
+%             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
+%             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
+%             if isempty(event_ind_pellet) || isempty(event_ind_cue)
+%             elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
+%             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
 %                 % Fast block
+%                 lastTrialShaded=2;
 %                 if strcmp(shades{2},'none')
 %                 else
 %                     line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
 %                 end
+%             else
+%                 % Slow block
+%                 lastTrialShaded=1;
+%                 if strcmp(shades{1},'none')
+%                 else
+%                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
+%                 end
 %             end
-        end
-    end
-    for j=1:length(plotfields)
-        if ~isfield(tbt,plotfields{j})
-            error([plotfields{j} ' field absent from tbt. See plotCueTriggered_settings.m to specify fields to plot.']);
-        end
-        currEvents=tbt.(plotfields{j});
-        event_thresh=settings.eventThresh{j};
-        event_ind=find(currEvents(i,:)>event_thresh);
-        n=length(event_ind);
-        if ischar(settings.firstN{j})
-            if strcmp('all',settings.firstN{j})
-                % plot all events
-                if n>500
-                    event_ind=event_ind(1:10:end);
-                    n=length(event_ind);
-                end
-            end
-        else
-            % plot first n events
-            n=settings.firstN{j};
-        end
-        if isempty(event_ind)
-            continue
-        end
-        for l=1:n
-            scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
-                'MarkerFaceColor',settings.eventColors{j},...
-                'LineWidth',settings.eventLineWidth);
-            hold on;
-        end       
-    end
-    k=k+1;
-end
+% %             elseif (timespertrial(event_ind_pellet(end))-timespertrial(event_ind_cue))>settings.blockITIThresh
+% %                 % Slow block
+% %                 if strcmp(shades{1},'none')
+% %                 else
+% %                     line([0 timespertrial(end)],[k k],'Color',shades{1},'LineWidth',10);
+% %                 end
+% %             else
+% %                 % Fast block
+% %                 if strcmp(shades{2},'none')
+% %                 else
+% %                     line([0 timespertrial(end)],[k k],'Color',shades{2},'LineWidth',10);
+% %                 end
+% %             end
+%         end
+%     end
+%     for j=1:length(plotfields)
+%         if ~isfield(tbt,plotfields{j})
+%             error([plotfields{j} ' field absent from tbt. See plotCueTriggered_settings.m to specify fields to plot.']);
+%         end
+%         currEvents=tbt.(plotfields{j});
+%         event_thresh=settings.eventThresh{j};
+%         event_ind=find(currEvents(i,:)>event_thresh);
+%         n=length(event_ind);
+%         if ischar(settings.firstN{j})
+%             if strcmp('all',settings.firstN{j})
+%                 % plot all events
+%                 if n>500
+%                     event_ind=event_ind(1:10:end);
+%                     n=length(event_ind);
+%                 end
+%             end
+%         else
+%             % plot first n events
+%             n=settings.firstN{j};
+%         end
+%         if isempty(event_ind)
+%             continue
+%         end
+%         for l=1:n
+%             scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
+%                 'MarkerFaceColor',settings.eventColors{j},...
+%                 'LineWidth',settings.eventLineWidth);
+%             hold on;
+%         end       
+%     end
+%     k=k+1;
+% end
 
 % Drop grooming time periods?
 groomingTrials=[];
