@@ -1,13 +1,13 @@
 function [aligned,settings]=cleanUpCue_basedOnArduino(aligned)
  
-isOrchestra=0;
+isOrchestra=1;
 
 if isOrchestra==1
     minProm=prctile(aligned.cueZone,95)-prctile(aligned.cueZone,40);
     minProm2=prctile(aligned.cueZone,60)-prctile(aligned.cueZone,20);
 else
-    minProm=75000;
-    minProm2=25000;
+    minProm=10000;
+    minProm2=5000;
 end
 settings.minProm=minProm;
 settings.minProm2=minProm2;
