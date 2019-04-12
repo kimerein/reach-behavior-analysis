@@ -4,6 +4,9 @@ function [dprimes,isreaching_out]=plotLearningCurve(exptDir,nameOfCue)
 
 [out,alltbt]=getSweepsFromBeh(alltbt);
 
+% Discard any sessions where nth_session is nan
+[alltbt,metadata,out]=excludeTrials(alltbt,metadata,out,'nth_session');
+
 isreaching_out=countMouseSuccessDropMiss(alltbt,metadata,out);
 
 % Various methods for calculating dprimes
@@ -22,7 +25,6 @@ isreaching_out.dprimes_postCue=dprimes_postCue;
 dprimes=min([dprimes_preCue; dprimes_postCue],[],1);
 
 end
-
 
 function out=countMouseSuccessDropMiss(tbt,metadata,ttclass)
 
