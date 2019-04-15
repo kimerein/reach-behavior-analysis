@@ -27,7 +27,7 @@ settings.zones(1).takeImageValue='intensity'; % which value to get from this zon
 settings.zones(2).name='LED zone';
 settings.zones(2).prompt='Draw a polygon enclosing the distractor LED zone on the image.';
 settings.zones(2).analysisField='LEDZone';
-settings.zones(2).takeImageValue='blue';
+settings.zones(2).takeImageValue='intensity';
 
 settings.zones(3).name='reach zone';
 settings.zones(3).prompt='Draw a polygon enclosing the area surrounding but NOT including the pellet.';
@@ -47,7 +47,7 @@ settings.zones(5).takeImageValue='intensity';
 settings.zones(6).name='cue zone';
 settings.zones(6).prompt='Draw a polygon enclosing the area illuminated when the cue turns on.';
 settings.zones(6).analysisField='cueZone';
-settings.zones(6).takeImageValue='blue';
+settings.zones(6).takeImageValue='intensity';
 
 settings.zones(7).name='opto zone';
 settings.zones(7).prompt='Draw a polygon enclosing the area illuminated when the optogenetic stimulus turns on.';

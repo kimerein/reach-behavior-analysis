@@ -1,13 +1,21 @@
-function [aligned,settings]=cleanUpCue_basedOnArduino(aligned)
+function [aligned,settings]=cleanUpCue_basedOnArduino(varargin)
  
-isOrchestra=1;
+isOrchestra=0;
 
-if isOrchestra==1
-    minProm=prctile(aligned.cueZone,95)-prctile(aligned.cueZone,40);
-    minProm2=prctile(aligned.cueZone,60)-prctile(aligned.cueZone,20);
+aligned=varargin{1};
+if length(varargin)>1
+    minProm=varargin{2};
+    minProm2=varargin{3};
 else
-    minProm=10000;
-    minProm2=5000;
+    if isOrchestra==1
+        %     minProm=prctile(aligned.cueZone,95)-prctile(aligned.cueZone,40);
+        %     minProm2=prctile(aligned.cueZone,60)-prctile(aligned.cueZone,20);
+        minProm=prctile(aligned.cueZone,99)-prctile(aligned.cueZone,1);
+        minProm2=prctile(aligned.cueZone,98)-prctile(aligned.cueZone,2);
+    else
+        minProm=70000;
+        minProm2=35000;
+    end
 end
 settings.minProm=minProm;
 settings.minProm2=minProm2;
