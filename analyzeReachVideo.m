@@ -62,6 +62,7 @@ alignment=finaldata;
 save([videoFile(1:endofVfname(end)-1) '_processed_data' '/final_aligned_data.mat'],'alignment');
 
 %% Plot results
+finaldata=alignment;
 if ~isfield(finaldata,'isGrooming')
    finaldata.isGrooming=zeros(size(finaldata.cueZone_onVoff)); 
 end

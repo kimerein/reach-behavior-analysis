@@ -1,4 +1,4 @@
-function wasControl=checkForRedOptoOnly(out)
+function [wasControl,out]=checkForRedOptoOnly(out)
 
 event_thresh=0.5;
 perc_thresh=10; % would not have set cue missing probability to less than this %
@@ -20,3 +20,6 @@ else
     wasControl=1;
     disp('This session WAS opto ONLY control');
 end
+out.event_thresh=event_thresh;
+out.perc_thresh=perc_thresh;
+out.percent_opto_but_no_cue=frac*100;

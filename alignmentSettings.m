@@ -5,7 +5,7 @@ function settings=alignmentSettings()
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-settings.discardLastN=10000;
+settings.discardLastN=0;
 
 % Is this running on Harvard server, automatically? If yes, set to 1
 settings.isOrchestra=0;
@@ -13,7 +13,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.45;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -80,8 +80,8 @@ settings.fractionThroughArduino=0.3;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.01;
-settings.try_scale2=0.01;  
+settings.try_scale1=0.0;
+settings.try_scale2=0.015;  
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
