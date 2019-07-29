@@ -1,4 +1,4 @@
-function wasControl=checkForNoCueControl(out)
+function [wasControl,out]=checkForNoCueControl(out)
 
 % out is from out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat'])
 % returns whether or not this session was a "no cue" control
@@ -27,6 +27,9 @@ else
     wasControl=1;
     disp('This session WAS no cue control');
 end
+out.event_thresh=event_thresh;
+out.perc_thresh=perc_thresh;
+out.perc_missing_cue=frac*100;
 
 
 

@@ -361,6 +361,22 @@ for i=1:length(plotfields)
 end
 legend(plotfields);
 
+% Fill in times with respect to cue in each trial (with respect to trial
+% start)
+tbt.times_wrt_trial_start=nan(size(tbt.times));
+for i=1:size(tbt.times)
+    useTimesForSeries=tbt.times(i,:);
+    temp=tbt.(nameOfCue);
+    cueInd=find(temp(i,:)>0.5,1,'first');
+    useTimesForSeries=useTimesForSeries-useTimesForSeries(cueInd); % cue is now occurring at time zero
+    useTimesForSeries=useTimesForSeries+pointsFromPreviousTrial*bettermode; % adjust zero to be start of trial
+    % times after monotonically increasing times are no longer in
+    % this trial
+    isMonotonicIncrease=([useTimesForSeries(2:end) 0]-[useTimesForSeries(1:end-1) 0])>0;
+    useTimesForSeries(~isMonotonicIncrease)=nan;
+    tbt.times_wrt_trial_start(i,:)=useTimesForSeries;
+end
+
 if settings.useFixedTimeBins==1
     % tbt.optoOn=double(tbt.optoZone>settings.eventThresh{1});
     disp('Started resampling for fixed time bins');
@@ -378,7 +394,8 @@ if settings.useFixedTimeBins==1
             end
             % cut off anything that does not match times
             temp2(isnan(tbt.times(j,:)))=nan;
-            curr=timeseries(temp2(~isnan(temp2)),tbt.times(j,~isnan(temp2)));
+            useTimesForSeries=tbt.times_wrt_trial_start(j,:);
+            curr=timeseries(temp2(~isnan(temp2) & ~isnan(useTimesForSeries)),useTimesForSeries(~isnan(temp2) & ~isnan(useTimesForSeries)));
             res_curr=resample(curr,binTimes);
             newTimeTbt_temp(j,1:length(res_curr.data))=res_curr.data;
         end
