@@ -80,7 +80,11 @@ for i=1:length(cueInds)
     elseif i==1
         theseInds=1:cueInds(i+1)-1;
     else
-        theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
+        if cueInds(i)-pointsFromPreviousTrial<0
+            theseInds=1:cueInds(i+1)-1;
+        else
+            theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
+        end
     end
     for j=1:length(f)
         temp=tbt.(f{j});
@@ -173,7 +177,7 @@ for i=plot_cues
             temp=tbt.(nameOfCue);
             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if isempty(event_ind_pellet)
+            if isempty(event_ind_pellet) || isempty(event_ind_cue)
             elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
@@ -222,12 +226,14 @@ for i=plot_cues
             % plot first n events
             n=settings.firstN{j};
         end
-        for l=1:n
-            scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
+        if ~isempty(event_ind)
+            for l=1:n
+                scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
                 'MarkerFaceColor',settings.eventColors{j},...
                 'LineWidth',settings.eventLineWidth);
-            hold on;
-        end       
+                hold on;
+            end 
+        end
     end
     k=k+1;
 end

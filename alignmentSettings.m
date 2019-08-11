@@ -32,7 +32,8 @@ settings.movie_dec=1;
 % Throw out distractor LED durations in movie or arduino less than this
 % many ms
 % settings.useDistractorThresh=167; % in ms
-settings.useDistractorThresh=175; % in ms
+% settings.useDistractorThresh=170; % in ms
+settings.useDistractorThresh=1; % in ms
 % settings.useDistractorThresh=160; % in ms
 % settings.useDistractorThresh=150; % in ms
 
@@ -96,8 +97,8 @@ settings.try_delay2=150;
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
-settings.alignSegments=1750; % how many indices in each sub-section to independently align
-% settings.alignSegments=2500; % how many indices in each sub-section to independently align
+% settings.alignSegments=1750; % how many indices in each sub-section to independently align
+settings.alignSegments=2500; % how many indices in each sub-section to independently align
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
@@ -126,10 +127,10 @@ settings.alignField(7).name='lickZone';
 settings.alignField(7).fromarduino=0;
 settings.alignField(8).name='cueZone';
 settings.alignField(8).fromarduino=0;
-settings.alignField(9).name='isGrooming';
+% settings.alignField(9).name='isGrooming';
+% settings.alignField(9).fromarduino=0;
+settings.alignField(9).name='isChewing';
 settings.alignField(9).fromarduino=0;
-settings.alignField(10).name='isChewing';
-settings.alignField(10).fromarduino=0;
 
 % Whether to add back all LED distractor events (including short ones, on
 % the edge of what movie frame rate can capture) before final alignment
