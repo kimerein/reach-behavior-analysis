@@ -13,8 +13,10 @@ else
         minProm=prctile(aligned.cueZone,99)-prctile(aligned.cueZone,1);
         minProm2=prctile(aligned.cueZone,98)-prctile(aligned.cueZone,2);
     else
-        minProm=15000;
-        minProm2=7000;
+%         minProm=150000;
+%         minProm2=70000;
+        minProm=100000;
+        minProm2=50000;
     end
 end
 settings.minProm=minProm;

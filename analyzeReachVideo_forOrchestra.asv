@@ -97,16 +97,8 @@ for i=1:length(movie_names)
             if ~isempty(setup_settings.custom_answers)
                 if setup_settings.custom_answers(1)==1
                     % switch distractor and cue
-                    temp=out.distractorStart;
-                    out.distractorStart=out.cueStart;
-                    out.cueStart=temp;
-                    temp=out.distractorOn;
-                    out.distractorOn=out.cueOn;
-                    out.cueOn=temp;
-                    settings.switchedDistractorAndCue=true;
-                end
-            end
-        end 
+                    temp=out.
+            
     	save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
     
     	% Discard end of video
