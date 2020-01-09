@@ -9,8 +9,8 @@ settings.prompt2='Found frame? If not, set second argument to this function such
 settings.framesPerChunk=750; % how many movie frames for setup_reach_coding.m
 
 % Add custom prompts
-settings.n_custom=1; % number of custom prompts
-settings.prompts_custom={'Did you switch distractor and cue in this session?'};
+settings.n_custom=0; % number of custom prompts
+% settings.prompts_custom={'Did you switch distractor and cue in this session?'};
 
 % Save results to file?
 settings.save=1; % 1 if want to save zones data to movie directory, 0 otherwise
@@ -56,7 +56,7 @@ settings.zones(6).takeImageValue='intensity';
 settings.zones(7).name='opto zone';
 settings.zones(7).prompt='Draw a polygon enclosing the area illuminated when the optogenetic stimulus turns on.';
 settings.zones(7).analysisField='optoZone';
-settings.zones(7).takeImageValue='red';
+settings.zones(7).takeImageValue='blue';
 
 settings.zones(8).name='lick zone';
 settings.zones(8).prompt='Draw a polygon enclosing the region where mouse tongue goes when mouse licks (not including the reward droplet).';

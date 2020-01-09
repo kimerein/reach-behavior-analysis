@@ -93,20 +93,6 @@ for i=1:length(movie_names)
     	% Get Arduino output data
     	out=parseSerialOut_wrapper([videoFile(1:endofVfname(end)-1) '_OUTPUT.TXT'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
     	settings=arduinoSettings();
-        if isfield(setup_settings,'custom_answers')
-            if ~isempty(setup_settings.custom_answers)
-                if setup_settings.custom_answers(1)==1
-                    % switch distractor and cue
-                    temp=out.distractorStart;
-                    out.distractorStart=out.cueStart;
-                    out.cueStart=temp;
-                    temp=out.distractorOn;
-                    out.distractorOn=out.cueOn;
-                    out.cueOn=temp;
-                    settings.switchedDistractorAndCue=true;
-                end
-            end
-        end 
     	save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
     
     	% Discard end of video
