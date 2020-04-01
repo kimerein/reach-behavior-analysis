@@ -6,9 +6,9 @@
 
 clear variables
 
-videoFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200218\Nov_ON\O2 output\2020-02-18 15-51-49-C.AVI';
+videoFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-42-18-C.AVI';
 chronuxPath='C:/Users/kim/Documents/MATLAB/chronux_2_11'; % path to Chronux
-parsedOutputFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200218\Nov_ON\O2 output\2020-02-18 15-51-49-C_parsedOutput.mat';
+parsedOutputFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-42-18-C_parsedOutput.mat';
 
 %% Set up 
 

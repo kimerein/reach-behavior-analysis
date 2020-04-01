@@ -356,6 +356,9 @@ for i=1:length(segmentInds)-1
         tryj=tryj+1;
     end
     tryj=1;
+    if endAt>length(temp1) || endAt>length(temp2)
+        endAt=min([length(temp1) length(temp2)]);
+    end
     while temp1(endAt)>0.5 || temp2(endAt)>0.5
         if temp1(endAt-tryj)<0.5 && temp2(endAt-tryj)<0.5
             endAt=endAt-tryj;
