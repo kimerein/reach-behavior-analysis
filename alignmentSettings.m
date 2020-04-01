@@ -1,25 +1,16 @@
-function settings=alignmentSettings(varargin)
+function settings=alignmentSettings()
 
 % Settings for getAlignment.m and discardLastNFrames.m
 % Note that microSD (Arduino) output is timed in ms
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-if ~isempty(varargin)
-    settings.discardLastN=varargin{1};
-else
-    settings.discardLastN=0;
-end
+settings.discardLastN=0;
 
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.15;
-if ~isempty(varargin)
-    if length(varargin)>1
-        settings.fractionRange=varargin{2};
-    end
-end
+settings.fractionRange=0.5;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -68,11 +59,6 @@ settings.maxlagForInitialAlign=[];
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
 settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
-if ~isempty(varargin)
-    if length(varargin)>2
-        settings.isInSecondHalf=varargin{3};
-    end
-end
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin?
