@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 function [aligned,settings]=cleanUpCue_basedOnArduino(varargin)
  
 isOrchestra=0;
@@ -20,11 +19,7 @@ else
 end
 settings.minProm=minProm;
 settings.minProm2=minProm2;
-=======
-function aligned=cleanUpCue_basedOnArduino(aligned)
->>>>>>> parent of dbb3a17... Merge remote-tracking branch 'origin/master'
 
-minProm=100;
 [~,fmovie,widths,proms]=findpeaks(aligned.cueZone,'MinPeakProminence',minProm);
 [~,farduino]=findpeaks(aligned.cue,'MinPeakHeight',0.5);
 usePeak=zeros(size(aligned.cueZone));
@@ -32,9 +27,9 @@ usePeak(isnan(aligned.cueZone))=nan;
 for i=1:length(farduino)
     currArduinoPeak=farduino(i);
     [~,mi]=min(abs(currArduinoPeak-fmovie));
-    for j=1:10
+    for j=1:50
         temp=aligned.cueZone(fmovie(mi)-(j-1))-aligned.cueZone(fmovie(mi)-j);
-        if temp>minProm
+        if temp>minProm2
             break
         end
     end

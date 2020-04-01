@@ -12,7 +12,7 @@ function analyzeReachVideo(videoFile,discardFirstNFrames)
 % plotCueTriggered_settings.m    : how to plot experimental results
 
 endofVfname=regexp(videoFile,'\.');
-endofDir=regexp(videoFile,'/');
+endofDir=regexp(videoFile,'\');
 
 %% Save discardFirstNFrames for rest of analysis
 settings=autoReachAnalysisSettings(discardFirstNFrames);
@@ -39,14 +39,17 @@ save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
 savehandles=discardLastNFrames(savehandles);
 
 %% Align Arduino output data and data from video file
-aligned=getAlignment(out,30,savehandles);
+aligned=getAlignment(out,30,savehandles,[]);
 save([videoFile(1:endofVfname(end)-1) '_aligned.mat'],'aligned');
 settings=alignmentSettings();
 save([videoFile(1:endofVfname(end)-1) '_alignmentSettings.mat'],'settings');
+aligned2=aligned;
 pause;
 
 %% Clean up cue from movie
-aligned=cleanUpCue(aligned);
+% aligned=cleanUpCue(aligned);
+[aligned,cleanup]=cleanUpCue_basedOnArduino(aligned2);
+save([videoFile(1:endofVfname(end)-1) '_cleanup_settings.mat'], 'cleanup');
 pause;
 
 %% Put Arduino output data and data from video file together
@@ -55,8 +58,14 @@ finaldata=integrateSDoutWithReaches(savehandles,out,30,aligned,[videoFile(1:endo
 
 %% Check for chewing of pellet (this should take a while -- pellet is large)
 finaldata=checkForChewedPellet(finaldata);
+alignment=finaldata;
+save([videoFile(1:endofVfname(end)-1) '_processed_data' '/final_aligned_data.mat'],'alignment');
 
 %% Plot results
+finaldata=alignment;
+if ~isfield(finaldata,'isGrooming')
+   finaldata.isGrooming=zeros(size(finaldata.cueZone_onVoff)); 
+end
 tbt=plotCueTriggeredBehavior(finaldata,'cueZone_onVoff',0);
 save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');
 settings=plotCueTriggered_settings();
