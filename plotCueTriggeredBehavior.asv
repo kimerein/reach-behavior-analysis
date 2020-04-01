@@ -1,25 +1,20 @@
 function tbt=plotCueTriggeredBehavior(varargin)
 
-if length(varargin)>3
-    data=varargin{1};
-    nameOfCue=varargin{2};
-    excludePawOnWheelTrials=varargin{3};
-    settings=varargin{4};
-else
-    data=varargin{1};
-    nameOfCue=varargin{2};
-    excludePawOnWheelTrials=varargin{3};
-    % Get settings for this analysis
-    settings=plotCueTriggered_settings();
-end
+if 
+data=varargin{1};
+nameOfCue=varargin{2};
+excludePawOnWheelTrials=varargin{3};
+settings=varargin{4};
 
 % nameOfCue should be 'cue' for real cue
 % 'cueZone_onVoff' for cue from movie
 % or 'arduino_distractor' for distractor
 
 % Get cue/data type for triggering trial-by-trial data
-cue=data.(nameOfCue);
+cue=data.(nameOfCue); 
 
+% Get settings for this analysis
+settings=plotCueTriggered_settings();
 % In case of issues with aliasing of instantaneous cue
 maxITI=settings.maxITI; % in seconds, maximal ITI
 minITI=settings.minITI; % in seconds, minimal ITI
@@ -32,7 +27,6 @@ bettermode=mode(timeIncs); % in ms
 bettermode=bettermode/1000; % in seconds
 
 % Fix aliasing issues with resampled data
-% if strcmp(nameOfCue,'cueZone_onVoff')
 if strcmp(nameOfCue,'cueZone_onVoff')
     [cue,cueInds,cueIndITIs]=fixAlias_forThreshCue(cue,maxITI,minITI,bettermode);
 else
@@ -80,11 +74,7 @@ for i=1:length(cueInds)
     elseif i==1
         theseInds=1:cueInds(i+1)-1;
     else
-        if cueInds(i)-pointsFromPreviousTrial<0
-            theseInds=1:cueInds(i+1)-1;
-        else
-            theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
-        end
+        theseInds=cueInds(i)-pointsFromPreviousTrial:cueInds(i+1)-1;
     end
     for j=1:length(f)
         temp=tbt.(f{j});
@@ -177,7 +167,7 @@ for i=plot_cues
             temp=tbt.(nameOfCue);
             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if isempty(event_ind_pellet) || isempty(event_ind_cue)
+            if isempty(event_ind_pellet)
             elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
@@ -217,23 +207,17 @@ for i=plot_cues
         if ischar(settings.firstN{j})
             if strcmp('all',settings.firstN{j})
                 % plot all events
-                if n>500
-                    event_ind=event_ind(1:10:end);
-                    n=length(event_ind);
-                end
             end
         else
             % plot first n events
             n=settings.firstN{j};
-        end
-        if ~isempty(event_ind)
-            for l=1:n
-                scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
+        end    
+        for l=1:n
+            scatter([timespertrial(event_ind(l))-settings.shiftBack{j} timespertrial(event_ind(l))-settings.shiftBack{j}],[k k],[],'MarkerEdgeColor',settings.eventOutlines{j},...
                 'MarkerFaceColor',settings.eventColors{j},...
                 'LineWidth',settings.eventLineWidth);
-                hold on;
-            end 
-        end
+            hold on; 
+        end       
     end
     k=k+1;
 end
@@ -255,7 +239,6 @@ if settings.histoDropGrooming==1 || settings.dropChewingInCue==1
             groomingTrials=[groomingTrials i];
         end
         if tbt.isChewing(i,cueInd)>0.5 % mouse is chewing during cue
-%         if tbt.isChewing(i,cueInd-5)>0.5 % mouse is chewing during cue
             % exclude this trial
             chewingTrials=[chewingTrials i];
         end
@@ -354,10 +337,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue));
+        [~,ma]=max(cue(indsIntoCue)); 
         cue(indsIntoCue(ma))=max(cue);
     end
-end
+end 
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',peakHeight);
@@ -367,7 +350,7 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan;
+        cueInds(checkTheseIntervals(i))=nan; 
     end
 end
 cueInds=cueInds(~isnan(cueInds));
@@ -393,10 +376,10 @@ checkTheseIntervals=find(cueIndITIs*bettermode>(maxITI*1.5));
 for i=1:length(checkTheseIntervals)
     indsIntoCue=cueInds(checkTheseIntervals(i))+floor((maxITI/2)./bettermode):cueInds(checkTheseIntervals(i)+1)-floor((maxITI/2)./bettermode);
     if any(cue(indsIntoCue)>0.001)
-        [~,ma]=max(cue(indsIntoCue));
+        [~,ma]=max(cue(indsIntoCue)); 
         cue(indsIntoCue(ma))=max(cue);
     end
-end
+end 
 
 % [pks,locs]=findpeaks(cue);
 [pks,locs]=findpeaks(cue,'MinPeakDistance',floor((minITI*0.75)/bettermode),'MinPeakProminence',relativePeakHeight);
@@ -406,12 +389,13 @@ checkTheseIntervals=find(cueIndITIs*bettermode<(minITI*0.75));
 if ~isempty(checkTheseIntervals)
     for i=1:length(checkTheseIntervals)
         cue(cueInds(checkTheseIntervals(i)))=0;
-        cueInds(checkTheseIntervals(i))=nan;
+        cueInds(checkTheseIntervals(i))=nan; 
     end
 end
 cueInds=cueInds(~isnan(cueInds));
 cueIndITIs=diff(cueInds);
 
 cue=cue./nanmax(cue);
-
+ 
 end
+

@@ -5,11 +5,11 @@ out.rawData=reachData;
 
 % user-set constants
 settings=autoReachAnalysisSettings();
-maxReachFrequency=settings.lick.maxReachFrequency; % in Hz, the maximum frequency at which mouse can reach
+maxReachFrequency=settings.reach.maxReachFrequency; % in Hz, the maximum frequency at which mouse can reach
 movie_fps=settings.movie_fps; % movie frame rate, in frames per second
-reachThresh=settings.lick.reachThresh; % after non-parametric transformation of reachData
-holdThreshold=settings.lick.holdThreshold; % in seconds -- if any reach lasts longer than 10 s, this is not a reach -- this is a hold
-plotOutput=settings.lick.plotOutput; % if 1, plot output, else do not plot
+reachThresh=settings.reach.reachThresh; % after non-parametric transformation of reachData
+holdThreshold=settings.reach.holdThreshold; % in seconds -- if any reach lasts longer than 10 s, this is not a reach -- this is a hold
+plotOutput=settings.reach.plotOutput; % if 1, plot output, else do not plot
 
 minReachPeriod=1/maxReachFrequency; % in seconds
 movieFramePeriod=1/movie_fps; % in seconds
