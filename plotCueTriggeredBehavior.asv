@@ -1,4 +1,10 @@
-function tbt=plotCueTriggeredBehavior(data,nameOfCue,excludePawOnWheelTrials)
+function tbt=plotCueTriggeredBehavior(varargin)
+
+if 
+data=varargin{1};
+nameOfCue=varargin{2};
+excludePawOnWheelTrials=varargin{3};
+settings=varargin{4};
 
 % nameOfCue should be 'cue' for real cue
 % 'cueZone_onVoff' for cue from movie
@@ -161,7 +167,8 @@ for i=plot_cues
             temp=tbt.(nameOfCue);
             event_ind_cue=find(temp(i,:)>event_thresh,1,'first');
             event_ind_pellet=find(tbt.pelletPresented(i,:)>event_thresh);
-            if event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
+            if isempty(event_ind_pellet)
+            elseif event_ind_pellet(end)>length(timespertrial) || event_ind_cue>length(timespertrial)
             elseif any((timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))>0 & (timespertrial(event_ind_pellet)-timespertrial(event_ind_cue))<settings.blockITIThresh)
                 % Fast block
                 lastTrialShaded=2;
@@ -217,9 +224,13 @@ end
 
 % Drop grooming time periods?
 groomingTrials=[];
-if settings.histoDropGrooming==1
+% Drop trials when mouse was chewing during cue?
+chewingTrials=[];
+if settings.histoDropGrooming==1 || settings.dropChewingInCue==1
     % Find trials when animal was grooming during cue and exclude these
     % trials
+    % Find trials when mouse was already chewing when cue came on
+    % Exclude these trials
     temp=tbt.(nameOfCue);
     for i=1:size(temp,1)
         cueInd=find(temp(i,:)>0.5,1,'first');
@@ -227,6 +238,22 @@ if settings.histoDropGrooming==1
             % exclude this trial
             groomingTrials=[groomingTrials i];
         end
+        if tbt.isChewing(i,cueInd)>0.5 % mouse is chewing during cue
+            % exclude this trial
+            chewingTrials=[chewingTrials i];
+        end
+    end
+    if settings.histoDropGrooming==1
+        plot_cues=plot_cues(~ismember(plot_cues,groomingTrials));
+        disp('Excluding from histograms the following trials where mouse was grooming during cue');
+        disp(groomingTrials);
+    end
+    if settings.dropChewingInCue==1
+        plot_cues=plot_cues(~ismember(plot_cues,chewingTrials));
+        disp('Excluding from histograms the following trials where mouse was chewing during cue');
+        disp(chewingTrials);
+    end
+end
 
 % Plot overlap trial-by-trial average
 figure();
@@ -292,6 +319,8 @@ for j=1:length(u)
     legend(plotfields);
     title(settings.trialType_name{j});
 end
+
+tbt=backup_tbt;
 
 end
 

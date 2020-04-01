@@ -1,0 +1,32 @@
+function finaldata=checkForChewedPellet(finaldata)
+
+settings=autoReachAnalysisSettings();
+
+minTimePelletChew=settings.chew.minTimeToChewPellet;
+withinXSeconds=settings.chew.withinXSeconds;
+fps=settings.movie_fps;
+% Convert to inds
+minIndToPelletChew=floor(minTimePelletChew/(1/fps));
+withinXInds=floor(withinXSeconds/(1/fps));
+
+% Check that for each reach classified as a success, there is at least this
+% much chewing time after the cue, 
+
+% First for reaches where paw does not start on wheel
+
+end
+
+function checkForSufficientChewing(reaches,chewing,minIndToPelletChew,withinXInds)
+
+fi=find(reaches==1);
+ficue=findpeaks(cue,'MinPeakProminence',0.5);
+for i=1:length(fi)
+    currReachInd=fi(i);
+    temp=currReachInd-ficue; % preceding cues will give positive value
+    temp(temp<0)=max(temp);
+    [~,mi]=min(temp); % find closest preceding cue
+    currCueInd=ficue(mi);
+    % is there enough chewing within X seconds of this reach
+    
+
+end
