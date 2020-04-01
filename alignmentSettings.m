@@ -7,10 +7,13 @@ function settings=alignmentSettings()
 % Discard the last N frames of the movie where N is discardLastN
 settings.discardLastN=0;
 
+% Is this running on Harvard server, automatically? If yes, set to 1
+settings.isOrchestra=0;
+
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.45;
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -31,11 +34,18 @@ settings.movie_dec=1;
 
 % Throw out distractor LED durations in movie or arduino less than this
 % many ms
+<<<<<<< HEAD
 % settings.useDistractorThresh=167; % in ms
 % settings.useDistractorThresh=170; % in ms
 settings.useDistractorThresh=1; % in ms
 % settings.useDistractorThresh=160; % in ms
+=======
+% settings.useDistractorThresh=180; % in ms
+% settings.useDistractorThresh=1; % in ms
+>>>>>>> origin/master
 % settings.useDistractorThresh=150; % in ms
+% settings.useDistractorThresh=160; % in ms
+settings.useDistractorThresh=0; % in ms
 
 % If, for example, experimenter forget to include LED in movie frame at beginning of
 % experiment, but Arduino was on, need to discard beginning of arduino
@@ -58,7 +68,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -68,7 +78,7 @@ settings.isInSecondHalf=true; % set this to true if movie matches a later sectio
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.4; 
+settings.fractionThroughArduino=0.3; 
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -77,8 +87,8 @@ settings.fractionThroughArduino=0.4;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.01;
-settings.try_scale2=0.01;  
+settings.try_scale1=0.0;
+settings.try_scale2=0.015;  
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -98,7 +108,11 @@ settings.try_delay2=150;
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
 % settings.alignSegments=1750; % how many indices in each sub-section to independently align
+<<<<<<< HEAD
 settings.alignSegments=2500; % how many indices in each sub-section to independently align
+=======
+settings.alignSegments=20000; % how many indices in each sub-section to independently align
+>>>>>>> origin/master
 % For more precise local alignment, decrease alignSegments. For more
 % precise global alignment, increase alignSegments.
 
@@ -121,6 +135,7 @@ settings.alignField(5).fromarduino=1;
 % These data types are from movie
 % Note that the names for these should match the names of fields in
 % zoneVals
+% Note that these are referenced in reformatAutoClassifyOutput.m
 settings.alignField(6).name='optoZone';
 settings.alignField(6).fromarduino=0;
 settings.alignField(7).name='lickZone';
@@ -131,6 +146,13 @@ settings.alignField(8).fromarduino=0;
 % settings.alignField(9).fromarduino=0;
 settings.alignField(9).name='isChewing';
 settings.alignField(9).fromarduino=0;
+<<<<<<< HEAD
+=======
+settings.alignField(10).name='isHold';
+settings.alignField(10).fromarduino=0;
+settings.alignField(11).name='pelletPresent';
+settings.alignField(11).fromarduino=0;
+>>>>>>> origin/master
 
 % Whether to add back all LED distractor events (including short ones, on
 % the edge of what movie frame rate can capture) before final alignment

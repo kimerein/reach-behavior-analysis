@@ -47,7 +47,7 @@ settings.zones(5).takeImageValue='intensity';
 settings.zones(6).name='cue zone';
 settings.zones(6).prompt='Draw a polygon enclosing the area illuminated when the cue turns on.';
 settings.zones(6).analysisField='cueZone';
-settings.zones(6).takeImageValue='blue';
+settings.zones(6).takeImageValue='intensity';
 
 settings.zones(7).name='opto zone';
 settings.zones(7).prompt='Draw a polygon enclosing the area illuminated when the optogenetic stimulus turns on.';

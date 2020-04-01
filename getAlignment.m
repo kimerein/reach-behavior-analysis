@@ -1,10 +1,12 @@
-function aligned=getAlignment(out,moviefps,handles)
+function aligned=getAlignment(out,moviefps,handles,settings)
 
 % Note that microSD (Arduino) output is timed in ms
 % Whereas video is timed in frames per sec
 
 % Get settings for alignment
-settings=alignmentSettings();
+if isempty(settings)
+    settings=alignmentSettings();
+end
 
 % Remove incomplete reach detections
 isnotnaninds=~isnan(mean([handles.reachStarts' handles.pelletTime' handles.eatTime' handles.pelletMissing'],2));
@@ -20,9 +22,17 @@ end
 % Try to align based on distractor LED from movie and Arduino output
 temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
+% temp_LED=temp_LED-smooth(temp_LED,51)';
+% temp_LED=temp_LED-min(temp_LED);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
-figure();
+
+% Check for single points above thresh -- LED duration is more than 1 frame
+isGreater=temp_LED>threshForOnVsOff;
+justOnePoint=[diff(isGreater(1:2))==-1 diff(isGreater(1:end-1))==1 & diff(isGreater(2:end))==-1];
+temp_LED(justOnePoint)=threshForOnVsOff-1;
+
+figz(1)=figure();
 movie_times=0:(1/moviefps)*1000:(length(temp_LED)-1)*((1/moviefps)*1000);
 plot(movie_times,temp_LED,'Color','b');
 hold on;
@@ -93,7 +103,7 @@ temp1=arduino_LED_ITIs./max(arduino_LED_ITIs);
 temp2=movie_LED_ITIs./max(movie_LED_ITIs);
 % temp1=temp1-nanmean(temp1);
 % temp2=temp2-nanmean(temp2);
-if isempty(settings.maxlagForInitialAlign)
+if isempty(settings.maxlagForInitialAlign) 
     [X,Y,D]=alignsignals(temp1,temp2); 
 else
     [X,Y,D]=alignsignals(temp1,temp2,settings.maxlagForInitialAlign); 
@@ -124,6 +134,10 @@ else
         size_of_arduino=length(arduino_LED(locs_arduino((-D)+1):locs_arduino((-D)+1+length(movie_LED_ITIs))));
     end
     size_of_movie=length(movie_LED(locs(1):locs(end)));
+%     size_of_movie=length(movie_LED(locs(383-312):locs(403-312)));
+%     size_of_arduino=length(arduino_LED(locs_arduino(383):locs_arduino(403)));
+%     movie_peak_indexIntoMovie=locs(383-312);
+%     arduino_peak_indexIntoArduino=locs_arduino(383);
     guess_best_scale=size_of_arduino/size_of_movie;
     guess_best_scale1=guess_best_scale;
     % Adjust according to guess_best_scale
@@ -139,14 +153,14 @@ else
     tryscales=guess_best_scale+settings.try_scale1:tryinc:guess_best_scale+settings.try_scale2;
 end
 
-figure();
+figz(2)=figure();
 plot(X,'Color','b');
 hold on;
 plot(Y,'Color','r');
 title('Preliminary alignment of movie distractor intervals onto arduino distractor intervals');
-legend({'Arduino distractor intervals','Movie distractor intervals'})
+legend({'Arduino distractor intervals','Movie distractor intervals'});
 
-figure();
+figz(3)=figure();
 plot(arduino_LED,'Color','b');
 hold on;
 plot([nan(1,guess_best_delay) movie_LED],'Color','r');
@@ -154,8 +168,10 @@ title('Preliminary alignment of movie distractor onto arduino distractor');
 legend({'Arduino distractor','Movie distractor'});
 
 % Wait for user to confirm preliminary alignment
-pause;
-
+if settings.isOrchestra~=1
+    pause;
+end
+ 
 % Test signal alignment and scaling
 disp('Now refining alignment ...');
 sumdiffs=nan(length(tryscales),length(trydelays));
@@ -169,13 +185,14 @@ if settings.alignWithAllEvents==1
     backup_movie_LED=resample(backup_movie_LED,floor(mod(size_of_arduino/size_of_movie,1)*100)+floor((guess_best_scale*100)/100)*100,100);
     throwOutMovie=interp(throwOutMovie,movie_dec);
     movie_LED_for_finalalignment(throwOutMovie>0.5)=0;
-    figure(); 
+    figz(4)=figure(); 
     plot(allEvents_movie_LED,'Color','b'); 
     hold on; 
     plot(movie_LED_for_finalalignment,'Color','r');
     legend({'before removal','after removal'});
     title('Remove short, skipped frame LED distractors before alignment');
 else
+    figz(4)=figure;
     backup_movie_LED=movie_LED;
     forSecondaryAlignment=backup_movie_LED;
     backup_arduino_LED=arduino_LED;
@@ -213,7 +230,7 @@ sumdiffs(isnan(sumdiffs))=3*ma;
 [minval,mi]=min(sumdiffs(:));
 [mi_row,mi_col]=ind2sub(size(sumdiffs),mi);
 
-figure(); 
+figz(5)=figure(); 
 imagesc(sumdiffs);
 title('Finding best alignment');
 xlabel('Trying different delays');
@@ -235,7 +252,7 @@ movieToLength=length(best_arduino);
 if length(best_arduino)>length(best_movie)
     best_movie=[best_movie nan(1,length(best_arduino)-length(best_movie))];
 end
-figure();
+figz(6)=figure();
 plot(best_movie,'Color','r');
 hold on;
 plot(best_arduino,'Color','b');
@@ -353,7 +370,7 @@ for i=1:length(segmentInds)-1
     mov_distractor=[mov_distractor temp1];
     arduino_distractor=[arduino_distractor temp2];
 end
-figure();
+figz(7)=figure();
 plot(mov_distractor,'Color','r');
 hold on;
 plot(arduino_distractor,'Color','b');
@@ -394,7 +411,7 @@ for i=fi:length(arduino_distractor)
     end
 end
 aligned.arduino_distractor=arduino_distractor;
-figure();
+figz(8)=figure();
 plot(mov_distractor,'Color','r');
 hold on;
 plot(arduino_distractor,'Color','b');
@@ -533,9 +550,11 @@ end
 k=1;
 donotdoalign=settings.donotdoalign;
 if length(peakLocs_rescaled)~=length(peakLocs)
-    disp('May be a problem: different numbers of LED distractor flashes during alignment of movieframeinds');
+    fortitle='May be a problem: different numbers of LED distractor flashes during alignment of movieframeinds';
+    disp(fortitle);
 else
-    disp('Good: matching LED distractor flashes during alignment of movieframeinds');
+    fortitle='Good: matching LED distractor flashes during alignment of movieframeinds';
+    disp(fortitle);
 end
 for i=1:length(peakLocs)
     up=movieframeinds_raw(peakLocs(i));
@@ -586,7 +605,7 @@ else
 end
 
 % Plot results
-figure();
+figz(9)=figure();
 ha=tight_subplot(7,1,[0.06 0.03],[0.08 0.1],[0.1 0.01]);
 currha=ha(1);
 axes(currha);
@@ -641,9 +660,15 @@ set(currha,'XTickLabel','');
 % set(currha,'YTickLabel','');
 
 % Plot realigned movieframeinds
-figure();
+figz(10)=figure();
 plot(aligned.movieframeinds);
-title('Check movieframeinds after secondary alignment');
+title(fortitle);
+
+if settings.isOrchestra==1
+    endofVfname=regexp(handles.filename,'\.');
+    savefig(figz,[handles.filename(1:endofVfname(end)-1) '_alignmentFigs.fig'],'compact');
+    close all
+end
 
 end
 
@@ -730,7 +755,7 @@ function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,
 % If like movie, scaleThisSignal=1
 % else scaleThisSignal=0
 
-signal=decimate(signal,decind);
+signal=decimate(double(signal),decind);
 if scaleThisSignal==1
     % Like movie 
     % From initial alignment

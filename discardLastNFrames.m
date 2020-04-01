@@ -19,10 +19,21 @@ for i=1:length(f)
         temp=savehandles.(f{i});
         temp(lastNotNan-discardLastN+1:lastNotNan)=nan;
         savehandles.(f{i})=temp;
-    elseif ~ischar(savehandles.(f{i}))
+    elseif ~islogical(savehandles.(f{i})) & ~ischar(savehandles.(f{i}))
         % Event refer to inds
         temp=savehandles.(f{i});
         temp=temp(~(temp>=lastNFrames(1) & temp<=lastNFrames(end)));
+        savehandles.(f{i})=temp;
+    end
+end
+
+% Make other fields match
+for i=1:length(f)
+    if islogical(savehandles.(f{i}))
+        % Refers to reaches
+        % Discard values correponding to the discarded reaches
+        temp=savehandles.(f{i});
+        temp=temp(1:length(savehandles.reachStarts));
         savehandles.(f{i})=temp;
     end
 end
