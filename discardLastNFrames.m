@@ -1,6 +1,10 @@
 function savehandles=discardLastNFrames(savehandles)
 
-settings=alignmentSettings;
+if isfield(savehandles,'discardLastN')
+    settings=alignmentSettings(savehandles.discardLastN);
+else
+    settings=alignmentSettings;
+end
 
 discardLastN=settings.discardLastN;
 if discardLastN==0

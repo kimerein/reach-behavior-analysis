@@ -51,6 +51,10 @@ for i=1:length(movie_names)
 	settings=autoReachAnalysisSettings(a.settings.discardFirstNFrames);
 	cd(mydir)    
 
+        % Read in user's video setup specifics
+        a=load([videoFile(1:endofVfname(end)-1) '_setupReachSettings.mat']);
+    	setup_settings=a.settings;
+    
     	% Load names of zones
     	a=load([videoFile(1:endofVfname(end)-1) '_zones.mat']);
     	zones=a.zones;

@@ -1,4 +1,4 @@
-function zones=setup_reach_coding(varargin)
+function [zones,custom_answers]=setup_reach_coding(varargin)
 
 % Gets user-defined zones of movie
 % See setup_reach_coding_settings.m for which zones to get
@@ -69,6 +69,23 @@ switch continuebutton
     case 'Yes'
     case 'Cancel'
         return
+end
+
+% Ask user other questions
+custom_answers=[];
+if isfield(settings,'n_custom')
+    if settings.n_custom>0
+        custom_answers=nan(1,settings.n_custom);
+        for i=1:settings.n_custom
+            continuebutton=questdlg(settings.prompts_custom{i},['Question ' num2str(i)],'Yes','No','No');
+            switch continuebutton
+                case 'Yes'
+                    custom_answers(i)=1;
+                case 'No'
+                    custom_answers(i)=0;
+            end
+        end
+    end
 end
 
 % Close implay fig, reopen an image so user can draw in zones

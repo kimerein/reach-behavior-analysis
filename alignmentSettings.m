@@ -1,11 +1,15 @@
-function settings=alignmentSettings()
+function settings=alignmentSettings(varargin)
 
 % Settings for getAlignment.m and discardLastNFrames.m
 % Note that microSD (Arduino) output is timed in ms
 % Whereas video is timed in frames per sec
 
 % Discard the last N frames of the movie where N is discardLastN
-settings.discardLastN=0;
+if ~isempty(varargin)
+    settings.discardLastN=varargin{1};
+else
+    settings.discardLastN=0;
+end
 
 % Is this running on Harvard server, automatically? If yes, set to 1
 settings.isOrchestra=0;
@@ -13,7 +17,12 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.45;
+settings.fractionRange=0.15;
+if ~isempty(varargin)
+    if length(varargin)>1
+        settings.fractionRange=varargin{2};
+    end
+end
 
 % Minimum time between distractor LED on intervals
 settings.minLEDinterval=1; % in seconds
@@ -69,6 +78,11 @@ settings.maxlagForInitialAlign=[];
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
 settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+if ~isempty(varargin)
+    if length(varargin)>2
+        settings.isInSecondHalf=varargin{3};
+    end
+end
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -78,7 +92,12 @@ settings.isInSecondHalf=false; % set this to true if movie matches a later secti
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.3; 
+settings.fractionThroughArduino=0.6; 
+if ~isempty(varargin)
+    if length(varargin)>3
+        settings.fractionThroughArduino=varargin{4};
+    end
+end
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -87,8 +106,16 @@ settings.fractionThroughArduino=0.3;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=0.0;
-settings.try_scale2=0.015;  
+settings.try_scale1=0;
+settings.try_scale2=0.02;  
+if ~isempty(varargin)
+    if length(varargin)>4
+        temp=varargin{5};
+        settings.tryinc=temp(1);
+        settings.try_scale1=temp(2);
+        settings.try_scale2=temp(3);
+    end
+end
 % If the preliminary alignment seems to produce an under-scaling of movie
 % data with respect to arduino data, increase try_scale1 and try_scale2.
 % If the preliminary alignment seems to produce an over-scaling of movie
@@ -101,7 +128,7 @@ settings.try_scale2=0.015;
 % different delays similar to this best guess. The code will try all delays
 % between
 % trydelays=guess_best_delay+try_delay1:guess_best_delay+try_delay2;
-settings.try_delay1=-150;
+settings.try_delay1=-300;
 settings.try_delay2=150;
 
 % The movie DVR occasionally skips. For final alignment, code will subtly 
