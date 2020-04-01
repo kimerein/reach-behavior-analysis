@@ -1,6 +1,6 @@
 function analyzeReachVideo_wrapper(doFunction,vars)
 
-switch doFunction
+switch doFunction 
     case 'extractEventsFromMovie'
         videoFile=vars.videoFile;
         endofVfname=vars.endofVfname;
