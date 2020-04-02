@@ -450,6 +450,11 @@ end
 % This is just a test for alignDataLikeDistractor method
 aligned.testRunDistractor=alignDataLikeDistractor(testRunLED,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
 
+aSet=arduinoSettings();
+if aSet.noInterlock==1
+      out.interlockSamples=zeros(size(out.interlockSamples));
+end
+
 % Align other fields from arduino or movie
 for i=1:length(settings.alignField)
     n=settings.alignField(i).name;

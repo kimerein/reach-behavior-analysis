@@ -6,9 +6,9 @@
 
 clear variables
 
-videoFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-42-18-C.AVI';
+videoFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-12-30-C.AVI';
 chronuxPath='C:/Users/kim/Documents/MATLAB/chronux_2_11'; % path to Chronux
-parsedOutputFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-42-18-C_parsedOutput.mat';
+parsedOutputFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200228\April_long\O2 output\2011-12-24 03-12-30-C_parsedOutput.mat';
 
 %% Set up 
 
@@ -23,10 +23,22 @@ endofDir=regexp(videoFile,'\');
 
 % Variables to adjust:
 discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
+chewThresh=0.9; % default is 1
+
+if chewThresh~=1
+    qans=questdlg('Chewing threshold is usually 1. Are you sure you want to proceed with a different value for chewThresh?');
+    switch qans
+        case 'Yes' 
+        case 'No'
+            chewThresh=1;
+        case 'Cancel'
+            chewThresh=1;
+    end
+end
 
 a=load([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat']);
 settings=a.settings;
-settings=autoReachAnalysisSettings(settings.discardFirstNFrames+discardMoreFramesAtBeginning,true,chronuxPath);
+settings=autoReachAnalysisSettings(settings.discardFirstNFrames+discardMoreFramesAtBeginning,true,chronuxPath,chewThresh);
 a=load([videoFile(1:endofVfname(end)-1) '_zoneVals.mat']);
 zoneVals=a.zoneVals;
 vars.videoFile=videoFile;
@@ -71,8 +83,8 @@ fractionThroughArduino=0.6;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-try_scale1=0; % minimum scaling to try (+guess_best_scale)
-try_scale2=0.02; % maximum scaling to try (+guess_best_scale)
+try_scale1=0.02; % minimum scaling to try (+guess_best_scale)
+try_scale2=0.05; % maximum scaling to try (+guess_best_scale)
 
 
 if ~isempty(parsedOutputFile)
