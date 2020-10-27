@@ -47,6 +47,26 @@ vars.endofDir=endofDir;
 vars.zoneVals=zoneVals;
 analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
 
+%% STEP 1.5
+% Check whether reach accidentally grabbed distractor
+
+a=load([videoFile(1:endofVfname(end)-1) '_reaches.mat']);
+reaches=a.reaches;
+a=load([videoFile(1:endofVfname(end)-1) '_savehandles.mat']);
+savehandles=a.savehandles;
+
+figure(); 
+plot(reaches.rawData-nanmin(reaches.rawData),'Color','k'); 
+hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach-nanmin(reaches.isReach))).*nanmax(reaches.rawData-nanmin(reaches.rawData)),'Color','r'); 
+plot(savehandles.LEDvals-nanmin(savehandles.LEDvals),'Color','b');
+legend({'black: raw reach data','red: classified as reach','blue: distractor'});
+
+
+figure(); plot(reaches.rawData,'Color','r'); hold on; plot(savehandles.LEDvals,'Color','b');
+hold on; plot(savehandles.pelletPresent,'Color','g');
+hold on; plot(savehandles.pelletPresent*8e5,'Color','g');
+hold on; plot(savehandles.optoZone,'Color','k');
+hold on; plot(savehandles.cueZone,'Color','m');
 %% STEP 2 -- Alignment of Arduino and Movie
 % If there are problems with the alignment (or if you've re-run STEP 1), run this
 
