@@ -215,6 +215,7 @@ k=1;
 plotfields=settings.plotevents;
 lastTrialShaded=0;
 trialTypes=nan(1,length(plot_cues));
+% comment out
 % for i=plot_cues
 %     % Classify this trial type
 %     if (k==1 && settings.excludeFirstTrial==1) || (lastTrialShaded==0)
@@ -308,6 +309,7 @@ trialTypes=nan(1,length(plot_cues));
 %     end
 %     k=k+1;
 % end
+% end comment out
 
 % Drop grooming time periods?
 groomingTrials=[];

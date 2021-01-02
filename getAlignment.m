@@ -9,6 +9,9 @@ if isempty(settings)
 end
 
 % Remove incomplete reach detections
+if length(handles.eatTime)<length(handles.reachStarts)
+    handles.eatTime=[handles.eatTime ones(1,length(handles.reachStarts)-length(handles.eatTime))*handles.eatTime(end)];
+end
 isnotnaninds=~isnan(mean([handles.reachStarts' handles.pelletTime' handles.eatTime' handles.pelletMissing'],2));
 f=fieldnames(handles);
 l=length(handles.reachStarts);

@@ -8,7 +8,7 @@ function settings=alignmentSettings(varargin)
 if ~isempty(varargin)
     settings.discardLastN=varargin{1};
 else
-    settings.discardLastN=0;
+    settings.discardLastN=2000;
 end
 
 % Is this running on Harvard server, automatically? If yes, set to 1
@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.7;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};
@@ -70,7 +70,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
 if ~isempty(varargin)
     if length(varargin)>2
         settings.isInSecondHalf=varargin{3};
@@ -99,8 +99,8 @@ end
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=-0.005;
-settings.try_scale2=0.018;  
+settings.try_scale1=0.00;
+settings.try_scale2=0.03;  
 if ~isempty(varargin)
     if length(varargin)>4
         temp=varargin{5};
