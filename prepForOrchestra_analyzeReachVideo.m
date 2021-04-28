@@ -20,8 +20,9 @@ settings=autoReachAnalysisSettings(discardFirstNFrames);
 save([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat'],'settings');
 
 %% Get user-defined movie zones
-setup_reach_coding(videoFile,discardFirstNFrames);
+[~,custom_answers]=setup_reach_coding(videoFile,discardFirstNFrames);
 settings=setup_reach_coding_settings();
+settings.custom_answers=custom_answers;
 save([videoFile(1:endofVfname(end)-1) '_setupReachSettings.mat'],'settings');
 
 %% Write these movie zones to a text file

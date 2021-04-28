@@ -6,9 +6,11 @@
 
 clear variables
 
+
 videoFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200624\Nov_ON\O2 output\2011-01-21 22-00-53-C.AVI';
 chronuxPath='C:\Program Files\MATLAB\chronux_2_12'; % path to Chronux
 parsedOutputFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200624\Nov_ON\O2 output\2011-01-21 21-31-05-C_parsedOutput.mat';
+
 
 %% Set up 
 
@@ -22,8 +24,10 @@ endofDir=regexp(videoFile,'\');
 % If either figure is problematic, run this section
 
 % Variables to adjust:
+
 discardMoreFramesAtBeginning=0; % Throw out this many more frames at the beginning of the video
 chewThresh=1; % default is 1
+
 
 if chewThresh~=1
     qans=questdlg('Chewing threshold is usually 1. Are you sure you want to proceed with a different value for chewThresh?');
@@ -47,12 +51,36 @@ vars.endofDir=endofDir;
 vars.zoneVals=zoneVals;
 analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
 
-    
+
+%% STEP 1.5
+% Check whether reach accidentally grabbed distractor
+
+a=load([videoFile(1:endofVfname(end)-1) '_reaches.mat']);
+reaches=a.reaches;
+a=load([videoFile(1:endofVfname(end)-1) '_savehandles.mat']);
+savehandles=a.savehandles;
+
+figure(); 
+plot(reaches.rawData-nanmin(reaches.rawData),'Color','k'); 
+hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach-nanmin(reaches.isReach))).*nanmax(reaches.rawData-nanmin(reaches.rawData)),'Color','r'); 
+plot(savehandles.LEDvals-nanmin(savehandles.LEDvals),'Color','b');
+legend({'black: raw reach data','red: classified as reach','blue: distractor'});
+
+
+figure(); plot(reaches.rawData,'Color','r'); hold on; plot(savehandles.LEDvals,'Color','b');
+hold on; plot(savehandles.pelletPresent,'Color','g');
+hold on; plot(savehandles.pelletPresent*8e5,'Color','g');
+hold on; plot(savehandles.optoZone,'Color','k');
+hold on; plot(savehandles.cueZone,'Color','m');
+
 %% STEP 2 -- Alignment of Arduino and Movie
 % If there are problems with the alignment (or if you've re-run STEP 1), run this
 
 % Variables to adjust:
+
 discardFramesAtEnd=0; %Throw out this many frames at the end of the video
+
+
 
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
@@ -65,7 +93,9 @@ fractionRange=0.3;
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+
+isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+
 
 % For fractionThroughArduino ...
 % Where in the arduino data stream does the movie begin? 
@@ -75,7 +105,9 @@ isInSecondHalf=true; % set this to true if movie matches a later section of ardu
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-fractionThroughArduino=0.4; 
+
+fractionThroughArduino=0.6; 
+
 
 % The code will try different scalings of the movie data onto the arduino
 % data. An initial guess at the correct scaling will be chosen based on a
@@ -84,8 +116,10 @@ fractionThroughArduino=0.4;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
+
 try_scale1=0; % minimum scaling to try (+guess_best_scale)
 try_scale2=0.05; % maximum scaling to try (+guess_best_scale)
+
 
 if ~isempty(parsedOutputFile)
     a=load(parsedOutputFile);
@@ -118,7 +152,9 @@ analyzeReachVideo_wrapper('getAlignment',vars);
 % STEP 2), run this
 
 % Variables to adjust:
-minProm=25000; % minimum height of "cue" signal in movie
+
+minProm=100000; % minimum height of "cue" signal in movie
+
 
 a=load([videoFile(1:endofVfname(end)-1) '_aligned.mat']);
 aligned2=a.aligned;

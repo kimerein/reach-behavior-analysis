@@ -8,6 +8,10 @@ settings.prompt1='Pause movie at a frame with both paws on perch, cue/opto on, a
 settings.prompt2='Found frame? If not, set second argument to this function such that beginning of movie includes a useful frame.';
 settings.framesPerChunk=750; % how many movie frames for setup_reach_coding.m
 
+% Add custom prompts
+settings.n_custom=0; % number of custom prompts
+% settings.prompts_custom={'Did you switch distractor and cue in this session?'};
+
 % Save results to file?
 settings.save=1; % 1 if want to save zones data to movie directory, 0 otherwise
 
