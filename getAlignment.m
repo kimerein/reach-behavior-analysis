@@ -356,6 +356,9 @@ for i=1:length(segmentInds)-1
         tryj=tryj+1;
     end
     tryj=1;
+    if endAt>length(temp1) || endAt>length(temp2)
+        endAt=min([length(temp1) length(temp2)]);
+    end
     while temp1(endAt)>0.5 || temp2(endAt)>0.5
         if temp1(endAt-tryj)<0.5 && temp2(endAt-tryj)<0.5
             endAt=endAt-tryj;
@@ -446,6 +449,11 @@ end
 % Align distractor from arduino
 % This is just a test for alignDataLikeDistractor method
 aligned.testRunDistractor=alignDataLikeDistractor(testRunLED,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
+
+aSet=arduinoSettings();
+if aSet.noInterlock==1
+      out.interlockSamples=zeros(size(out.interlockSamples));
+end
 
 % Align other fields from arduino or movie
 for i=1:length(settings.alignField)

@@ -1,4 +1,4 @@
-function zones=setup_reach_coding(varargin)
+function [zones,custom_answers]=setup_reach_coding(varargin)
 
 % Gets user-defined zones of movie
 % See setup_reach_coding_settings.m for which zones to get
@@ -57,7 +57,8 @@ end
 fig=implay(allframes,30);
 fig.Parent.Position=[10 10 400 400];
 pause;
-if ~isempty(regexp(version,'2019b','once')) || ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2020b','once'))
+
+if ~isempty(regexp(version,'2019b','once')) || ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2018b','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
@@ -69,6 +70,23 @@ switch continuebutton
     case 'Yes'
     case 'Cancel'
         return
+end
+
+% Ask user other questions
+custom_answers=[];
+if isfield(settings,'n_custom')
+    if settings.n_custom>0
+        custom_answers=nan(1,settings.n_custom);
+        for i=1:settings.n_custom
+            continuebutton=questdlg(settings.prompts_custom{i},['Question ' num2str(i)],'Yes','No','No');
+            switch continuebutton
+                case 'Yes'
+                    custom_answers(i)=1;
+                case 'No'
+                    custom_answers(i)=0;
+            end
+        end
+    end
 end
 
 % Close implay fig, reopen an image so user can draw in zones
