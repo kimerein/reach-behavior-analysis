@@ -26,7 +26,7 @@ endofDir=regexp(videoFile,'\');
 % Variables to adjust:
 
 discardMoreFramesAtBeginning=0; % Throw out this many more frames at the beginning of the video
-chewThresh=1.5; % default is 1
+chewThresh=1; % default is 1
 
 
 if chewThresh~=1
@@ -85,7 +85,7 @@ discardFramesAtEnd=0; %Throw out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.3;
+fractionRange=0.6;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
@@ -94,7 +94,7 @@ fractionRange=0.3;
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
 
-isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 
 % For fractionThroughArduino ...
@@ -106,7 +106,7 @@ isInSecondHalf=true; % set this to true if movie matches a later section of ardu
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
 
-fractionThroughArduino=0.4; 
+fractionThroughArduino=0; 
 
 
 % The code will try different scalings of the movie data onto the arduino
