@@ -94,7 +94,7 @@ fractionRange=0.1;
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
 
-isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 
 
 % For fractionThroughArduino ...
