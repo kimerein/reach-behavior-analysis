@@ -59,9 +59,12 @@ fig.Parent.Position=[10 10 400 400];
 pause;
 
 if ~isempty(regexp(version,'2019b','once')) || ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2018b','once'))
+if ~isempty(regexp(version,'2019b','once')) || ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2018b','once'))|| ~isempty(regexp(version,'2020b','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
+    currentFrameNumber=fig.Data.Controls.CurrentFrame;
+        return
 end
 
 % Instructions to user
