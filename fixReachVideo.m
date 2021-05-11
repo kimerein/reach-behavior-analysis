@@ -7,9 +7,9 @@
 clear variables
 
 
-videoFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20210423\Mar_5\O2 output\2011-11-20 17-55-19-C.AVI';
+videoFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20210507\Mar_5\O2 output\2011-12-04 16-56-34-C.AVI';
 chronuxPath='C:\Program Files\MATLAB\chronux_2_11'; % path to Chronux
-parsedOutputFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20210423\Mar_5\O2 output\2011-11-20 17-25-31-C_parsedOutput.mat';
+parsedOutputFile='\\research.files.med.harvard.edu\Neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20210507\Mar_5\O2 output\2011-12-04 16-56-34-C_parsedOutput.mat';
 
 
 %% Set up 
@@ -26,7 +26,7 @@ endofDir=regexp(videoFile,'\');
 % Variables to adjust:
 
 discardMoreFramesAtBeginning=0; % Throw out this many more frames at the beginning of the video
-chewThresh=1.5; % default is 1
+chewThresh=1; % default is 1
 
 
 if chewThresh~=1
@@ -85,7 +85,7 @@ discardFramesAtEnd=0; %Throw out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.3;
+fractionRange=0.1;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
@@ -106,7 +106,7 @@ isInSecondHalf=true; % set this to true if movie matches a later section of ardu
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
 
-fractionThroughArduino=0.4; 
+fractionThroughArduino=0; 
 
 
 % The code will try different scalings of the movie data onto the arduino
@@ -117,7 +117,7 @@ fractionThroughArduino=0.4;
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
 
-try_scale1=0; % minimum scaling to try (+guess_best_scale)
+try_scale1=0.01; % minimum scaling to try (+guess_best_scale)
 try_scale2=0.05; % maximum scaling to try (+guess_best_scale)
 
 
