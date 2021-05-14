@@ -66,8 +66,9 @@ slice=varargin{1};
 guititle=varargin{2};
 h=imagesc(slice);
 colormap gray
-set(h.Parent.Parent,'Position',[0 0 640 800]);
+set(h.Parent.Parent,'Position',[10 10 400 600]);
 set(h.Parent.Parent,'Name',guititle)
+set(handles.pushbutton1,'Position',[85.5714 50 13.8571 1.6667]);
 handles.h=h;
 handles.slice=slice;
 
