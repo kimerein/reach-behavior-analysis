@@ -8,7 +8,7 @@ function settings=alignmentSettings(varargin)
 if ~isempty(varargin)
     settings.discardLastN=varargin{1};
 else
-    settings.discardLastN=2000;
+    settings.discardLastN=0;
 end
 
 % Is this running on Harvard server, automatically? If yes, set to 1
@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.7;
+settings.fractionRange=0.5;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};
@@ -70,7 +70,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
 if ~isempty(varargin)
     if length(varargin)>2
         settings.isInSecondHalf=varargin{3};
