@@ -57,7 +57,7 @@ end
 fig=implay(allframes,30);
 fig.Parent.Position=[100 100 800 800];
 pause;
-if ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2018b','once')) || ~isempty(regexp(version,'2020b','once'))
+if ~isempty(regexp(version,'2017b','once')) || ~isempty(regexp(version,'2018b','once')) ||  ~isempty(regexp(version,'2020b','once')) || ~isempty(regexp(version,'2021a','once'))
     currentFrameNumber=fig.DataSource.Controls.CurrentFrame;
 else
     currentFrameNumber=fig.data.Controls.CurrentFrame;
