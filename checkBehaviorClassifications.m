@@ -23,15 +23,19 @@ for i=1:length(whichTypesToCheck)
     timingoff=nan(1,takeN);
     for j=1:length(checkthesetrials)
         checkingtrial=whichtrials(checkthesetrials(j));
-        if beh_tbt.from_first_video(checkingtrial,1)>lowThresh
-            whichvid=1;
-        elseif beh_tbt.from_second_video(checkingtrial,1)>lowThresh
-            whichvid=2;
-        elseif beh_tbt.from_third_video(checkingtrial,1)>lowThresh
-            whichvid=3;
+        if ~isfield(beh_tbt,'from_first_video')
+           whichvid=0;
         else
-            disp('May be problem -- this trial is not from any video');
-            continue
+            if beh_tbt.from_first_video(checkingtrial,1)>lowThresh
+                whichvid=1;
+            elseif beh_tbt.from_second_video(checkingtrial,1)>lowThresh
+                whichvid=2;
+            elseif beh_tbt.from_third_video(checkingtrial,1)>lowThresh
+                whichvid=3;
+            else
+                disp('May be problem -- this trial is not from any video');
+                continue
+            end
         end
         aretypeframes=find(temp(checkingtrial,:)>lowThresh);
         useit=randsample(length(aretypeframes),1);
