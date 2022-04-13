@@ -70,7 +70,7 @@ settings.maxlagForInitialAlign=[];
 % alignment of the movie data at the beginning of the arduino data.
 % If, in fact, the movie comes in the second half of the arduino data
 % stream, indicate this by setting isInSecondHalf to true.
-settings.isInSecondHalf=false; % set this to true if movie matches a later section of arduino data stream
+settings.isInSecondHalf=true; % set this to true if movie matches a later section of arduino data stream
 if ~isempty(varargin)
     if length(varargin)>2
         settings.isInSecondHalf=varargin{3};
@@ -85,7 +85,7 @@ end
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.6; 
+settings.fractionThroughArduino=0.75; 
 if ~isempty(varargin)
     if length(varargin)>3
         settings.fractionThroughArduino=varargin{4};
@@ -99,7 +99,7 @@ end
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-settings.try_scale1=0.00;
+settings.try_scale1=0.0;
 settings.try_scale2=0.03;  
 if ~isempty(varargin)
     if length(varargin)>4

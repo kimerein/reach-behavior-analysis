@@ -274,6 +274,9 @@ mov_distractor=[];
 arduino_distractor=[];
 firstInd=find(~isnan(best_movie) & ~isnan(best_arduino),1,'first');
 lastBoth=min([find(~isnan(best_movie),1,'last') find(~isnan(best_arduino),1,'last')]);
+if lastBoth-firstInd<alignSegments
+    alignSegments=ceil((lastBoth-firstInd)/2);
+end
 segmentInds=firstInd:floor(alignSegments/2):lastBoth;
 allMatchedInds=firstInd:lastBoth;
 mov_distractor=[mov_distractor nan(1,firstInd-1)];
@@ -327,7 +330,7 @@ for i=1:length(segmentInds)-1
     elseif i==length(segmentInds)-1
         % alignment easily messed up at end -- just use delay from previous
         % segment
-        if segmentDelays(i-1)>0 
+        if segmentDelays(i-1)>0
             temp1=[ones(1,segmentDelays(i-1))*temp1(1) temp1];
         else
             temp2=[ones(1,-segmentDelays(i-1))*temp2(1) temp2];
@@ -339,13 +342,13 @@ for i=1:length(segmentInds)-1
         else % temp2 has been delayed by D samples
             startAt=tookTheseIndsOfTemp1(1);
         end
-        endAt=min([length(temp1) length(temp2)]);        
+        endAt=min([length(temp1) length(temp2)]);
     else
         if D>0 % temp1 has been delayed by D samples
-            startAt=tookTheseIndsOfTemp1(1)+D; 
+            startAt=tookTheseIndsOfTemp1(1)+D;
             endAt=tookTheseIndsOfTemp1(end)+D;
         else % temp2 has been delayed by D samples
-            startAt=tookTheseIndsOfTemp1(1); 
+            startAt=tookTheseIndsOfTemp1(1);
             endAt=tookTheseIndsOfTemp1(end);
         end
     end
@@ -368,7 +371,7 @@ for i=1:length(segmentInds)-1
             break
         end
         tryj=tryj+1;
-    end     
+    end
     temp1=temp1(startAt:endAt);
     temp2=temp2(startAt:endAt);
     moveChunks(i,1)=startAt;
