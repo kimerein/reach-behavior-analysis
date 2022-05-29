@@ -5,7 +5,8 @@ function isCorrect=checkBehaviorClassifications(beh_tbt)
 % check video for correct classification
 
 nTrialsPerType=5; % number of trials of each type to check
-whichTypesToCheck={'reachBatch_success_reachStarts','reachBatch_drop_reachStarts','reachBatch_miss_reachStarts'};
+whichTypesToCheck={'reachBatch_success_reachStarts','reachBatch_drop_reachStarts','reachBatch_miss_reachStarts','pelletmissingreach_reachStarts'};
+% whichTypesToCheck={'reachBatch_drop_reachStarts'};
 lowThresh=0.05;
 
 isCorrect=nan(length(whichTypesToCheck),3); % rows are different types of events, first col is number correct, second col is total number checked, third col is number with timing off
