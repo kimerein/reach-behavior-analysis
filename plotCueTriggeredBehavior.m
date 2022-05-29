@@ -71,7 +71,9 @@ minITI=settings.minITI; % in seconds, minimal ITI
 % Get time delay
 timeIncs=diff(data.timesfromarduino(data.timesfromarduino~=0));
 mo=mode(timeIncs);
-timeIncs(timeIncs==mo)=nan;
+if mo==0
+    timeIncs(timeIncs==mo)=nan;
+end
 bettermode=mode(timeIncs); % in ms
 % bettermode=mo;
 bettermode=bettermode/1000; % in seconds
