@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.6;
+settings.fractionRange=0.5;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};
@@ -85,7 +85,7 @@ end
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.8; 
+settings.fractionThroughArduino=0.7; 
 if ~isempty(varargin)
     if length(varargin)>3
         settings.fractionThroughArduino=varargin{4};

@@ -491,7 +491,19 @@ f=fieldnames(aligned);
 temp=aligned.movie_distractor;
 for i=1:length(f)
     curr=aligned.(f{i});
+    if abs(length(curr)-length(temp))<50
+        % fix completely a hack, not good KR
+        if length(curr)<length(temp)
+            curr=[curr nan(1,abs(length(curr)-length(temp)))];
+        end
+    end
     aligned.(f{i})=curr(~isnan(temp));
+end
+if abs(length(movieframeinds)-length(temp))<50
+    % fix completely a hack, not good KR
+    if length(movieframeinds)<length(temp)
+        movieframeinds=[movieframeinds nan(1,abs(length(movieframeinds)-length(temp)))];
+    end
 end
 movieframeinds=movieframeinds(~isnan(temp));
   
