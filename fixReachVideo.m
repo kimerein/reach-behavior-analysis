@@ -1,3 +1,5 @@
+function fixReachVideo
+
 % fixReachVideo.m
 
 % this is a script
@@ -6,34 +8,39 @@
 
 clear variables
 
-videoFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200218\Nov_ON\O2 output\2020-02-18 15-51-49-C.AVI';
-chronuxPath='C:/Users/kim/Documents/MATLAB/chronux_2_11'; % path to Chronux
-parsedOutputFile='\\research.files.med.harvard.edu\neurobio\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20200218\Nov_ON\O2 output\2020-02-18 15-51-49-C_parsedOutput.mat';
+videoFile='2020-02-17 14-55-46-C.AVI';
+chronuxPath='/Users/kim/Documents/GitHub/chronux_2_11'; % path to Chronux
+parsedOutputFile='2020-02-17 14-55-46-C_parsedOutput.mat';
 
 %% Set up 
 
 % Set up video-specific variables
-endofVfname=regexp(videoFile,'\.');
-endofDir=regexp(videoFile,'\');
+if ispc
+    endofVfname=regexp(videoFile,'/.');
+else
+    endofVfname=regexp(videoFile,'AVI');
+    endofVfname=endofVfname-1;
+end
+endofDir=regexp(videoFile,'/');
 
-%% Check O2 output STEP 1
-% First, check reachesFig.fig
-% Second, check pelletsFig.fig
-% If either figure is problematic, run this section
-
-% Variables to adjust:
-discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
-
-a=load([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat']);
-settings=a.settings;
-settings=autoReachAnalysisSettings(settings.discardFirstNFrames+discardMoreFramesAtBeginning,true,chronuxPath);
-a=load([videoFile(1:endofVfname(end)-1) '_zoneVals.mat']);
-zoneVals=a.zoneVals;
-vars.videoFile=videoFile;
-vars.endofVfname=endofVfname;
-vars.endofDir=endofDir;
-vars.zoneVals=zoneVals;
-analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
+% %% Check O2 output STEP 1
+% % First, check reachesFig.fig
+% % Second, check pelletsFig.fig
+% % If either figure is problematic, run this section
+% 
+% % Variables to adjust:
+% discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
+% 
+% a=load([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat']);
+% settings=a.settings;
+% settings=autoReachAnalysisSettings(settings.discardFirstNFrames+discardMoreFramesAtBeginning,true,chronuxPath);
+% a=load([videoFile(1:endofVfname(end)-1) '_zoneVals.mat']);
+% zoneVals=a.zoneVals;
+% vars.videoFile=videoFile;
+% vars.endofVfname=endofVfname;
+% vars.endofDir=endofDir;
+% vars.zoneVals=zoneVals;
+% analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
 
 %% STEP 2 -- Alignment of Arduino and Movie
 % If there are problems with the alignment (or if you've re-run STEP 1), run this
@@ -44,7 +51,7 @@ discardFramesAtEnd=0; % Thow out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.3;
+fractionRange=0.25;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
