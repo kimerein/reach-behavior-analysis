@@ -13,7 +13,7 @@ function analyzeReachVideo(videoFile,discardFirstNFrames)
 
 endofVfname=regexp(videoFile,'\.');
 endofDir=regexp(videoFile,'\');
-
+ 
 %% Save discardFirstNFrames for rest of analysis
 settings=autoReachAnalysisSettings(discardFirstNFrames);
 save([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat'],'settings');
@@ -51,6 +51,9 @@ pause;
 [aligned,cleanup]=cleanUpCue_basedOnArduino(aligned2);
 save([videoFile(1:endofVfname(end)-1) '_cleanup_settings.mat'], 'cleanup');
 pause;
+%[aligned,cleanup]=cleanUpCue_fillInArduino(aligned2);
+%aligned2=aligned; 
+%aligned=manuallyAddInCuesGUI(aligned2);
 
 %% Put Arduino output data and data from video file together
 [status]=mkdir([videoFile(1:endofVfname(end)-1) '_processed_data']);

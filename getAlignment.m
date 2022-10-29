@@ -9,6 +9,9 @@ if isempty(settings)
 end
 
 % Remove incomplete reach detections
+if length(handles.eatTime)<length(handles.reachStarts)
+    handles.eatTime=[handles.eatTime ones(1,length(handles.reachStarts)-length(handles.eatTime))*handles.eatTime(end)];
+end
 isnotnaninds=~isnan(mean([handles.reachStarts' handles.pelletTime' handles.eatTime' handles.pelletMissing'],2));
 f=fieldnames(handles);
 l=length(handles.reachStarts);
@@ -271,6 +274,9 @@ mov_distractor=[];
 arduino_distractor=[];
 firstInd=find(~isnan(best_movie) & ~isnan(best_arduino),1,'first');
 lastBoth=min([find(~isnan(best_movie),1,'last') find(~isnan(best_arduino),1,'last')]);
+if lastBoth-firstInd<alignSegments
+    alignSegments=ceil((lastBoth-firstInd)/2);
+end
 segmentInds=firstInd:floor(alignSegments/2):lastBoth;
 allMatchedInds=firstInd:lastBoth;
 mov_distractor=[mov_distractor nan(1,firstInd-1)];
@@ -324,7 +330,7 @@ for i=1:length(segmentInds)-1
     elseif i==length(segmentInds)-1
         % alignment easily messed up at end -- just use delay from previous
         % segment
-        if segmentDelays(i-1)>0 
+        if segmentDelays(i-1)>0
             temp1=[ones(1,segmentDelays(i-1))*temp1(1) temp1];
         else
             temp2=[ones(1,-segmentDelays(i-1))*temp2(1) temp2];
@@ -336,13 +342,13 @@ for i=1:length(segmentInds)-1
         else % temp2 has been delayed by D samples
             startAt=tookTheseIndsOfTemp1(1);
         end
-        endAt=min([length(temp1) length(temp2)]);        
+        endAt=min([length(temp1) length(temp2)]);
     else
         if D>0 % temp1 has been delayed by D samples
-            startAt=tookTheseIndsOfTemp1(1)+D; 
+            startAt=tookTheseIndsOfTemp1(1)+D;
             endAt=tookTheseIndsOfTemp1(end)+D;
         else % temp2 has been delayed by D samples
-            startAt=tookTheseIndsOfTemp1(1); 
+            startAt=tookTheseIndsOfTemp1(1);
             endAt=tookTheseIndsOfTemp1(end);
         end
     end
@@ -356,13 +362,16 @@ for i=1:length(segmentInds)-1
         tryj=tryj+1;
     end
     tryj=1;
+    if endAt>length(temp1) || endAt>length(temp2)
+        endAt=min([length(temp1) length(temp2)]);
+    end
     while temp1(endAt)>0.5 || temp2(endAt)>0.5
         if temp1(endAt-tryj)<0.5 && temp2(endAt-tryj)<0.5
             endAt=endAt-tryj;
             break
         end
         tryj=tryj+1;
-    end     
+    end
     temp1=temp1(startAt:endAt);
     temp2=temp2(startAt:endAt);
     moveChunks(i,1)=startAt;
@@ -447,6 +456,11 @@ end
 % This is just a test for alignDataLikeDistractor method
 aligned.testRunDistractor=alignDataLikeDistractor(testRunLED,temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
 
+aSet=arduinoSettings();
+if aSet.noInterlock==1
+      out.interlockSamples=zeros(size(out.interlockSamples));
+end
+
 % Align other fields from arduino or movie
 for i=1:length(settings.alignField)
     n=settings.alignField(i).name;
@@ -477,7 +491,19 @@ f=fieldnames(aligned);
 temp=aligned.movie_distractor;
 for i=1:length(f)
     curr=aligned.(f{i});
+    if abs(length(curr)-length(temp))<50
+        % fix completely a hack, not good KR
+        if length(curr)<length(temp)
+            curr=[curr nan(1,abs(length(curr)-length(temp)))];
+        end
+    end
     aligned.(f{i})=curr(~isnan(temp));
+end
+if abs(length(movieframeinds)-length(temp))<50
+    % fix completely a hack, not good KR
+    if length(movieframeinds)<length(temp)
+        movieframeinds=[movieframeinds nan(1,abs(length(movieframeinds)-length(temp)))];
+    end
 end
 movieframeinds=movieframeinds(~isnan(temp));
   

@@ -7,6 +7,9 @@ if isempty(alignment)
 end
 
 % Remove incomplete reach detections
+if length(reaches.eatTime)<length(reaches.reachStarts)
+    reaches.eatTime=[reaches.eatTime ones(1,length(reaches.reachStarts)-length(reaches.eatTime))*reaches.eatTime(end)];
+end
 isnotnaninds=~isnan(mean([reaches.reachStarts' reaches.pelletTime' reaches.eatTime'],2)) & (reaches.pelletTime'-reaches.reachStarts'>=0);
 f=fieldnames(reaches);
 l=length(reaches.reachStarts);
