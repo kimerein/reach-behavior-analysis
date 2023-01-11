@@ -1,4 +1,4 @@
-# for all .AVI files in directory, convert to .MP4
+# for all .AVI files in directory, convert to smaller .avi files with different codec
 
 import numpy as np
 import cv2
