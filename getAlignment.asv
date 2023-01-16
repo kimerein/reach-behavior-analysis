@@ -27,8 +27,7 @@ temp_LED=handles.LEDvals;
 temp_LED=temp_LED(~isnan(temp_LED));
 % temp_LED=temp_LED-smooth(temp_LED,51)';
 % temp_LED=temp_LED-min(temp_LED);
-% [~,whtorm]=rmoutliers(temp_LED,2,"ThresholdFactor",20);
-whtorm=temp_LED>20*mad(temp_LED,[],2)+median(temp_LED,2) | temp_LED<median(temp_LED,2)-20*mad(temp_LED,[],2);
+[~,whtorm]=rmoutliers(temp_LED,2,"mean","T");
 temp_LED(whtorm)=prctile(temp_LED,10);
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
@@ -805,7 +804,7 @@ end
 % [Xa,Ya] = alignsignals(X,Y)
 % X is movie, Y is arduino
 % If Y is delayed with respect to X, then D is positive and X is delayed by D samples.
-% If Y is advanced with respect to X, then D is negative and Y is delayed by –D samples.
+% If Y is advanced with respect to X, then D is negative and Y is delayed by â€“D samples.
 
 % disp('in second alignment');
 % disp(length(signal))

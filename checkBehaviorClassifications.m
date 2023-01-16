@@ -8,6 +8,8 @@ nTrialsPerType=5; % number of trials of each type to check
 whichTypesToCheck={'reachBatch_success_reachStarts','reachBatch_drop_reachStarts','reachBatch_miss_reachStarts','pelletmissingreach_reachStarts'};
 % whichTypesToCheck={'reachBatch_drop_reachStarts'};
 lowThresh=0.05;
+alsoSuggestShortVidNumber=true;
+framesPerShortVid=7513;
 
 isCorrect=nan(length(whichTypesToCheck),3); % rows are different types of events, first col is number correct, second col is total number checked, third col is number with timing off
 for i=1:length(whichTypesToCheck)
@@ -43,9 +45,19 @@ for i=1:length(whichTypesToCheck)
         whichframe=beh_tbt.movieframeinds(checkingtrial,aretypeframes(useit));
         opts.Default='No';
         opts.Interpreter='none';
-        answer=questdlg(['Movie ' num2str(whichvid) ' frame ' num2str(whichframe) ' is a ' currCheck '?'],...
+        if alsoSuggestShortVidNumber==true
+            % guess which short vid
+            % need to better implement this later
+            guessframe=mod(whichframe,framesPerShortVid);
+            guessvid=floor(whichframe/framesPerShortVid)+1;
+            answer=questdlg(['Movie ' num2str(guessvid) ' frame ' num2str(guessframe) ' is a ' currCheck '?'],...
                         'Checking event classifications',...
                         'Yes','No','Yes but timing off',opts);
+        else
+            answer=questdlg(['Movie ' num2str(whichvid) ' frame ' num2str(whichframe) ' is a ' currCheck '?'],...
+                        'Checking event classifications',...
+                        'Yes','No','Yes but timing off',opts);
+        end
         switch answer
             case 'Yes'
                 countingcorrect(j)=1;

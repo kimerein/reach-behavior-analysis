@@ -18,7 +18,7 @@ def convertLowSpeedAVIs():
     useTheseFiles = []
     useTheseFolders = []
     dirname = sys.argv[1]
-    for file in os.listdir(dirname):
+    for file in sorted(os.listdir(dirname)):
         if file.endswith(".AVI"):
             print(os.path.join(dirname, file))
             useTheseFiles.append(os.path.join(dirname, file))
