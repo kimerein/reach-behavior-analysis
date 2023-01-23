@@ -117,8 +117,12 @@ fractionThroughArduino=0.6;
 % to this best guess. The code will try all scalings between
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
-try_scale1=0.02; % minimum scaling to try (+guess_best_scale)
-try_scale2=0.05; % maximum scaling to try (+guess_best_scale)
+try_scale1=0; % minimum scaling to try (+guess_best_scale)
+try_scale2=0.02; % maximum scaling to try (+guess_best_scale)
+
+% Change delays to try
+try_delay1=0;
+try_delay2=300;
 
 
 if ~isempty(parsedOutputFile)
@@ -144,6 +148,8 @@ vars.fractionThroughArduino=fractionThroughArduino;
 vars.tryinc=tryinc;
 vars.try_scale1=try_scale1;
 vars.try_scale2=try_scale2;
+vars.try_delay1=try_delay1;
+vars.try_delay2=try_delay2;
 
 analyzeReachVideo_wrapper('getAlignment',vars);
 
@@ -183,3 +189,9 @@ vars.savehandles=savehandles;
 vars.aligned=aligned;
 
 analyzeReachVideo_wrapper('organizeData',vars);
+
+%% STEP 5 -- Run SVM to do final classification of success versus drop
+
+addpath(genpath(chronuxPath));
+fixDropVSuccess([videoFile(1:endofVfname(end)-1) '_processed_data'],videoFile(1:endofVfname(end)-1),[]);
+rmpath(genpath(chronuxPath));
