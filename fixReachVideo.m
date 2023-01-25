@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20220506\dLight_61\O2 output\VID_20130615_231105.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20220607\dLight_62\O2 output\VID_20130717_164553.avi';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20220506\dLight_61\O2 output\VID_20130615_231105_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20220607\dLight_62\O2 output\VID_20130717_164553_parsedOutput.mat';
 
 %% Set up
 
@@ -90,7 +90,7 @@ discardFramesAtEnd=0; % Thow out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.25;
+fractionRange=0.7;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
