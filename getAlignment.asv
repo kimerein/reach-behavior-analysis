@@ -392,8 +392,7 @@ aligned.movie_distractor=mov_distractor;
 aligned.arduino_distractor=arduino_distractor;
 
 % Times from arduino
-isTimes=true;
-timesfromarduino=alignLikeDistractor(double(backup_arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks,isTimes); 
+timesfromarduino=alignLikeDistractor(double(backup_arduino_times),0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks); 
 aligned.timesfromarduino=timesfromarduino; % note that this is in ms
 
 % Get rid of extraneous arduino LED distractor on intervals, in case of
@@ -473,7 +472,7 @@ for i=1:length(settings.alignField)
         aligned.(n)=alignDataLikeDistractor(out.(n),temptimes,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks);
     else
         % align like movie
-        aligned.(n)=alignDataLikeMovie(handles.(n),movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1,false);
+        aligned.(n)=alignDataLikeMovie(handles.(n),movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
     end
 end
 
@@ -482,14 +481,13 @@ end
 % Movie frame inds
 temp=1:length(handles.LEDvals);
 movieframeinds_raw=double(handles.discardFirstNFrames+temp);
-isTimes=true;
-movieframeinds=alignDataLikeMovie(movieframeinds_raw,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1,isTimes);
+movieframeinds=alignDataLikeMovie(movieframeinds_raw,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 % movieframeinds=alignLikeDistractor(movieframeinds_raw,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 movieframeinds_backup=movieframeinds;
 
 % Align distractor from movie
 % This is just a test for alignDataLikeMovie method
-aligned.testRunDistractor_movie=alignDataLikeMovie(testRun_movieLED,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1,false);
+aligned.testRunDistractor_movie=alignDataLikeMovie(testRun_movieLED,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 
 % In case looking at second half of savehandles
 f=fieldnames(aligned);
@@ -632,7 +630,7 @@ if donotdoalign==0
     end
     aligned.movieframeinds=rawmovieinds_onto_rescaled;
 else
-    aligned.movieframeinds=movieframeinds;
+    aligned.movieframeinds=smooth(movieframeinds,200);
 end
 
 % Plot results
@@ -765,9 +763,9 @@ return
 
 end
 
-function out=alignDataLikeMovie(data,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1,isTimes)
+function out=alignDataLikeMovie(data,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1)
 
-out=alignLikeDistractor(data,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1,isTimes);
+out=alignLikeDistractor(data,1,movie_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_movie,scaleBy,resampFac,moveChunks,guess_best_scale1);
 
 end
 
@@ -776,45 +774,32 @@ function out=alignDataLikeDistractor(data,times,arduino_dec,frontShift,shouldBeL
 temp=data';
 temp=temp(1:end);
 testRunDistractor=temp(~isnan(times));
-testRunDistractor=alignLikeDistractor(testRunDistractor,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks,[],false); 
+testRunDistractor=alignLikeDistractor(testRunDistractor,0,arduino_dec,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros_arduino,scaleBy,resampFac,moveChunks,[]); 
 out=testRunDistractor./nanmax(testRunDistractor);
 
 end
 
-function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros,scaleBy,resampFac,moveChunks,guess_best_scale1,isTimes)
+function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,shouldBeLength,movieToLength,alignSegments,segmentInds,segmentDelays,addZeros,scaleBy,resampFac,moveChunks,guess_best_scale1)
 
 % If like movie, scaleThisSignal=1
 % else scaleThisSignal=0
 
 signal=decimate(double(signal),decind);
 if scaleThisSignal==1
-    if isTimes==true
-        % different filter needed to prevent ringing artifacts and aliasing
-        % Like movie
-        normFc=0.98/max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
-        order=256*max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
-        beta=12; % smoothing
-        lpFilt = firls(order, [0 normFc normFc 1],[1 1 0 0]);
-        lpFilt = lpFilt .* kaiser(order+1,beta)';
-        lpFilt = lpFilt / sum(lpFilt);
-        p=floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100; lpFilt = p * lpFilt;
-        signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100,lpFilt);
-        % From initial alignment
-        % signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
-        % From final alignment
-        %temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
-        normFc=0.98/max(floor(scaleBy*resampFac),floor(resampFac));
-        order=256*max(floor(scaleBy*resampFac),floor(resampFac));
-        beta=100; % smoothing
-        lpFilt = firls(order, [0 normFc normFc 1],[1 1 0 0]);
-        lpFilt = lpFilt .* kaiser(order+1,beta)';
-        lpFilt = lpFilt / sum(lpFilt);
-        p=floor(scaleBy*resampFac); lpFilt = p * lpFilt;
-        temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac),lpFilt);
-    else
-        signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
-        temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
-    end
+    % Like movie 
+    normFc=0.98/max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+    order=256*max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+    beta=100; % smoothing
+    lpFilt = firls(order, [0 normFc normFc 1],[1 1 0 0]);
+    lpFilt = lpFilt .* kaiser(order+1,beta)';
+    lpFilt = lpFilt / sum(lpFilt);
+    lpFilt = p * lpFilt;
+    signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100,lpFilt);
+    % From initial alignment
+    % signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+    % From final alignment
+    %temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
+    
     % cut off ringing artifact
     temp(end-10+1:end)=nan;
     signal=[nan(1,frontShift) temp];
@@ -829,7 +814,7 @@ end
 % [Xa,Ya] = alignsignals(X,Y)
 % X is movie, Y is arduino
 % If Y is delayed with respect to X, then D is positive and X is delayed by D samples.
-% If Y is advanced with respect to X, then D is negative and Y is delayed by –D samples.
+% If Y is advanced with respect to X, then D is negative and Y is delayed by â€“D samples.
 
 % disp('in second alignment');
 % disp(length(signal))

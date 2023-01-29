@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.5;
+settings.fractionRange=0.4;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};
@@ -100,7 +100,7 @@ end
 % tryscales=guess_best_scale+try_scale1:tryinc:guess_best_scale+try_scale2
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
 settings.try_scale1=-0.02;
-settings.try_scale2=0.01;  
+settings.try_scale2=0.03;  
 if ~isempty(varargin)
     if length(varargin)>4
         temp=varargin{5};
@@ -121,7 +121,7 @@ end
 % different delays similar to this best guess. The code will try all delays
 % between
 % trydelays=guess_best_delay+try_delay1:guess_best_delay+try_delay2;
-settings.try_delay1=-400;
+settings.try_delay1=-600;
 settings.try_delay2=400;
 
 % The movie DVR occasionally skips. For final alignment, code will subtly 
