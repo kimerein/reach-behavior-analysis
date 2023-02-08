@@ -633,6 +633,7 @@ if donotdoalign==0
     aligned.movieframeinds=rawmovieinds_onto_rescaled;
 else
     aligned.movieframeinds=movieframeinds;
+%     aligned.movieframeinds=smooth(movieframeinds,100);
 end
 
 % Plot results
@@ -789,6 +790,8 @@ function outsignal=alignLikeDistractor(signal,scaleThisSignal,decind,frontShift,
 signal=decimate(double(signal),decind);
 if scaleThisSignal==1
     if isTimes==true
+%         signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+%         temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
         % different filter needed to prevent ringing artifacts and aliasing
         % Like movie
         normFc=0.98/max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
@@ -812,7 +815,24 @@ if scaleThisSignal==1
         p=floor(scaleBy*resampFac); lpFilt = p * lpFilt;
         temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac),lpFilt);
     else
+        normFc=0.98/max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+        order=256*max(floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+        beta=12; % smoothing
+        lpFilt = firls(order, [0 normFc normFc 1],[1 1 0 0]);
+        lpFilt = lpFilt .* kaiser(order+1,beta)';
+        lpFilt = lpFilt / sum(lpFilt);
+        p=floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100; lpFilt = p * lpFilt;
+
         signal=resample(signal,floor(mod(guess_best_scale1,1)*100)+floor((1*100)/100)*100,100);
+
+        normFc=0.98/max(floor(scaleBy*resampFac),floor(resampFac));
+        order=256*max(floor(scaleBy*resampFac),floor(resampFac));
+        beta=5; % smoothing
+        lpFilt = firls(order, [0 normFc normFc 1],[1 1 0 0]);
+        lpFilt = lpFilt .* kaiser(order+1,beta)';
+        lpFilt = lpFilt / sum(lpFilt);
+        p=floor(scaleBy*resampFac); lpFilt = p * lpFilt;
+
         temp=resample(signal,floor(scaleBy*resampFac),floor(resampFac));
     end
     % cut off ringing artifact
