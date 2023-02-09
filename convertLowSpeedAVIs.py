@@ -18,12 +18,19 @@ def convertLowSpeedAVIs():
     useTheseFiles = []
     useTheseFolders = []
     dirname = sys.argv[1]
-    for file in sorted(os.listdir(dirname)):
-        if file.endswith(".AVI"):
+    for file in sorted(os.listdir(dirname)):     
+        if file.endswith(".AVI") | file.endswith(".avi"):
             print(os.path.join(dirname, file))
             useTheseFiles.append(os.path.join(dirname, file))
-            # get associated processed_data folder
-            useTheseFolders.append(os.path.join(dirname, file)[:-4] + '_processed_data')
+            if file.endswith(".avi"):
+                thisisshortvid = True
+                #useTheseFolders.append(os.path.join(dirname, file.split('_')[0]) + '*' + '_processed_data')
+                useTheseFolders.append(file.split('_')[0] + '*' + '_processed_data')
+            else:
+                thisisshortvid = False
+                # get associated processed_data folder
+                #useTheseFolders.append(os.path.join(dirname, file)[:-4] + '_processed_data')
+                useTheseFolders.append(file[:-4] + '_processed_data')
             i=i+1
 
     for x in range(i):
@@ -36,23 +43,52 @@ def convertLowSpeedAVIs():
         frameCount = 0
         whichsmallvid = 0
 
-        # read in tbt.mat from processed_data folder
-        tbt = scipy.io.loadmat(useTheseFolders[x] + '/tbt.mat')
-        # index field in matlab struct
-        tbt = tbt['tbt'][0,0]
-        #temp = tbt['reachBatch_success_reachStarts']
-        #temp = temp.flatten()
-        # plot temp
-        #plt.plot(temp)
-        #plt.show()
-        # get behavior events from tbt
-        eventsInMovieFrames = getBehaviorEvents(tbt, n_frames_before_event, n_frames_after_event)
-        for key in eventsInMovieFrames:
-            print(eventsInMovieFrames[key])
-            print(2481 in eventsInMovieFrames[key])
+        if thisisshortvid == True:
+            # If variable tbt does not yet exist
+            if 'tbt' not in locals():
+                if '*' in useTheseFolders[x]:
+                    for folder in sorted(os.listdir(dirname)):
+                        if 'processed_data' in folder:
+                            tbt = scipy.io.loadmat(os.path.join(dirname, folder) + '/tbt.mat')
+                            break
+                else:
+                    tbt = scipy.io.loadmat(useTheseFolders[x] + '/tbt.mat')
+                # index field in matlab struct
+                tbt = tbt['tbt'][0,0]
+                #temp = tbt['reachBatch_success_reachStarts']
+                #temp = temp.flatten()
+                # plot temp
+                #plt.plot(temp)
+                #plt.show()
+                # get behavior events from tbt
+                eventsInMovieFrames = getBehaviorEvents(tbt, n_frames_before_event, n_frames_after_event)
+                for key in eventsInMovieFrames:
+                    print(eventsInMovieFrames[key])
+                    print(2481 in eventsInMovieFrames[key])
+            else:
+                # Adjust eventsInMovieFrames to account for short vid
+                for key in eventsInMovieFrames:
+                    eventsInMovieFrames[key] = [x - shortvidframecount for x in eventsInMovieFrames[key]]
+        else:
+            # read in tbt.mat from processed_data folder
+            tbt = scipy.io.loadmat(useTheseFolders[x] + '/tbt.mat')
+            # index field in matlab struct
+            tbt = tbt['tbt'][0,0]
+            #temp = tbt['reachBatch_success_reachStarts']
+            #temp = temp.flatten()
+            # plot temp
+            #plt.plot(temp)
+            #plt.show()
+            # get behavior events from tbt
+            eventsInMovieFrames = getBehaviorEvents(tbt, n_frames_before_event, n_frames_after_event)
+            for key in eventsInMovieFrames:
+                print(eventsInMovieFrames[key])
+                print(2481 in eventsInMovieFrames[key])
 
         while(cap.isOpened()):
             ret, frame = cap.read()
+            # Start frame count for short vids
+            shortvidframecount = 0
             if frameCount%500 == 0:
                 print(frameCount)
             if frameCount > maxFrames:
@@ -89,6 +125,7 @@ def convertLowSpeedAVIs():
             f.write('\n')
             frameCount = frameCount + 1
             smallFileFrameCount = smallFileFrameCount + 1
+            shortvidframecount = shortvidframecount + 1
 
         cap.release()
         
