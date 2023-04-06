@@ -6,6 +6,7 @@ function isCorrect=checkBehaviorClassifications(beh_tbt,isShortVid,framesPerShor
 
 nTrialsPerType=5; % number of trials of each type to check
 whichTypesToCheck={'reachBatch_success_reachStarts','reachBatch_drop_reachStarts','reachBatch_miss_reachStarts','pelletmissingreach_reachStarts'};
+% whichTypesToCheck={'success_tbt','drop_tbt','miss_tbt','reach_wout_pellet_tbt'};
 % whichTypesToCheck={'reachBatch_drop_reachStarts'};
 lowThresh=0.05;
 alsoSuggestShortVidNumber=isShortVid;

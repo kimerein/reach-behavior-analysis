@@ -31,7 +31,8 @@ savehandles=reformatAutoClassifyOutput(out,zoneVals,reaches,pellets,eat,paw,fidg
 save([videoFile(1:endofVfname(end)-1) '_savehandles.mat'],'savehandles');
 
 %% Get Arduino output data
-out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
+out=parseSerialOut_wrapper([videoFile(1:endofVfname(end)-1) '_OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
+% out=parseSerialOut_wrapper([videoFile(1:endofDir(end)) 'OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
 settings=arduinoSettings();
 save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
 
@@ -73,5 +74,11 @@ tbt=plotCueTriggeredBehavior(finaldata,'cueZone_onVoff',0);
 save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');
 settings=plotCueTriggered_settings();
 save([videoFile(1:endofVfname(end)-1) '_plottingSettings.mat'],'settings');
+
+%% Fix drop v success
+settings=autoReachAnalysisSettings();
+addpath(genpath(settings.chew.added_path));
+fixDropVSuccess([videoFile(1:endofVfname(end)-1) '_processed_data'],videoFile(1:endofVfname(end)-1),[]);
+rmpath(genpath(settings.chew.added_path));
 
 end

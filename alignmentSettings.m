@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.4;
+settings.fractionRange=0.3;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};
@@ -101,6 +101,8 @@ end
 settings.tryinc=0.00005; % this is the increment for trying different scalings of movie onto arduino data
 settings.try_scale1=-0.02;
 settings.try_scale2=0.03;  
+% settings.try_scale1=-0.001;
+% settings.try_scale2=0.001;  
 if ~isempty(varargin)
     if length(varargin)>4
         temp=varargin{5};
