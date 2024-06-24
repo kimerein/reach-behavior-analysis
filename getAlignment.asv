@@ -66,8 +66,8 @@ try
 catch
     % kim added try/catch 20240624
     temptimes=nan(size(temp));
-    temptimes(1:length(27:1:27+length(temp)-1))=27:1:27+length(temp)-1;
-    temptimes(isnan(temp))=nan;
+    temptimes(length(27:1:27+length(temp))
+
     arduino_LED=temp(~isnan(temptimes));
     arduino_times=temptimes(~isnan(temptimes));
 end
@@ -858,7 +858,7 @@ end
 % [Xa,Ya] = alignsignals(X,Y)
 % X is movie, Y is arduino
 % If Y is delayed with respect to X, then D is positive and X is delayed by D samples.
-% If Y is advanced with respect to X, then D is negative and Y is delayed by –D samples.
+% If Y is advanced with respect to X, then D is negative and Y is delayed by â€“D samples.
 
 % disp('in second alignment');
 % disp(length(signal))

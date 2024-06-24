@@ -78,7 +78,7 @@ if ismember('pelletLoaded',fieldnames(tbt))
         error('Please enter a number.');
     end
 else
-    endoftrialind=find(all(~isnan(tbt.cueZone_onVoff),1)==1,1,'last');
+    endoftrialind=find(all(~isnan(tbt.(nameOfCue)),1)==1,1,'last');
 end
 
 % Also plot experiment as events in a scatter plot
@@ -248,6 +248,9 @@ if settings.useFixedTimeBins==1
     binTimes=settings.binMids;
     for i=1:length(f)
         disp(['Resampling ' f{i}]);
+        if islogical(tbt.(f{i}))
+            tbt.(f{i})=single(tbt.(f{i}));
+        end
         temp=tbt.(f{i});
         newTimeTbt_temp=nan(size(temp,1),length(binTimes));
         for j=1:size(temp,1)

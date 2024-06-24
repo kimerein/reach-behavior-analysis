@@ -17,7 +17,7 @@ settings.isOrchestra=0;
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-settings.fractionRange=0.3;
+settings.fractionRange=0.5;
 if ~isempty(varargin)
     if length(varargin)>1
         settings.fractionRange=varargin{2};

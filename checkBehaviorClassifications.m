@@ -4,6 +4,11 @@ function isCorrect=checkBehaviorClassifications(beh_tbt,isShortVid,framesPerShor
 % for a random sampling of different reach type classifications, have user
 % check video for correct classification
 
+if ~isfield(beh_tbt,'reachBatch_success_reachStarts')
+    disp('Reach batches');
+    beh_tbt=addReachBatchesToSingleTbt(beh_tbt,'cueZone_onVoff',0.25,0,[]);
+end
+
 nTrialsPerType=5; % number of trials of each type to check
 whichTypesToCheck={'reachBatch_success_reachStarts','reachBatch_drop_reachStarts','reachBatch_miss_reachStarts','pelletmissingreach_reachStarts'};
 % whichTypesToCheck={'success_tbt','drop_tbt','miss_tbt','reach_wout_pellet_tbt'};
