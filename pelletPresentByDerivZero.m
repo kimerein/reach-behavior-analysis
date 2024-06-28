@@ -26,30 +26,30 @@ sigma2 = sqrt(gm.Sigma(2));
 % Define a function for the Gaussian PDF
 gaussian = @(x, mu, sigma) (1/(sigma * sqrt(2 * pi))) * exp(-0.5 * ((x - mu) / sigma).^2);
 
+% Generate x values for plotting the Gaussian curves
+x = linspace(min(data), max(data), 1000);
+
+% Calculate the Gaussian curves
+y1 = gaussian(x, mu1, sigma1) * gm.ComponentProportion(1);
+y2 = gaussian(x, mu2, sigma2) * gm.ComponentProportion(2);
+
 if ~isOrchestra
-    % Generate x values for plotting the Gaussian curves
-    x = linspace(min(data), max(data), 1000);
-
-    % Calculate the Gaussian curves
-    y1 = gaussian(x, mu1, sigma1) * gm.ComponentProportion(1);
-    y2 = gaussian(x, mu2, sigma2) * gm.ComponentProportion(2);
-
     % Plot the Gaussian curves on top of the histogram
     hold on;
     plot(x, y1 * length(data) * (x(2) - x(1)), 'r', 'LineWidth', 2);
     plot(x, y2 * length(data) * (x(2) - x(1)), 'b', 'LineWidth', 2);
+end
 
-    % Find the threshold that best separates the two modes
-    threshold = fzero(@(x) gaussian(x, mu1, sigma1) - gaussian(x, mu2, sigma2), mean([mu1 mu2]));
+% Find the threshold that best separates the two modes
+threshold = fzero(@(x) gaussian(x, mu1, sigma1) - gaussian(x, mu2, sigma2), mean([mu1 mu2]));
 
-    % Plot the threshold on the histogram
+% Plot the threshold on the histogram
 %     yLimits = ylim;
 %     plot([threshold threshold], yLimits, 'k--', 'LineWidth', 2);
 %     hold off;
 
-    % Display the threshold
+% Display the threshold
 %     fprintf('Threshold: %.2f\n', threshold);
-end
 
 % Get the mean of the higher mode and use as cutoff for pellet present
 % Note that this assumes the mean of the higher mode will be lower than the
