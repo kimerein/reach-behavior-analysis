@@ -85,7 +85,7 @@ end
 % This helps code find the correct alignment.
 % For example, if the movie begins 75% of the way through the arduino data
 % stream, set fractionThroughArduino to 3/4.
-settings.fractionThroughArduino=0.7; 
+settings.fractionThroughArduino=0.8; 
 if ~isempty(varargin)
     if length(varargin)>3
         settings.fractionThroughArduino=varargin{4};
