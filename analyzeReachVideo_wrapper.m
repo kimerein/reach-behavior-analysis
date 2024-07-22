@@ -6,6 +6,12 @@ switch doFunction
         endofVfname=vars.endofVfname;
         endofDir=vars.endofDir;
         zoneVals=vars.zoneVals;
+        if vars.subtractExternalCue==true
+            %pause;
+            result_signal=removeExternalCue(zoneVals.cueZone,zoneVals.pelletZone,zoneVals.LEDZone,true);
+            zoneVals.pelletZone(result_signal==0)=0;
+            zoneVals.pelletZone(result_signal==1)=1;
+        end
         [out,zoneVals,reaches,pellets,eat,paw,fidget,settings]=extractEventsFromMovie([videoFile(1:endofVfname(end)-1) '_zones.mat'],videoFile,zoneVals);
         
         savehandles=reformatAutoClassifyOutput(out,zoneVals,reaches,pellets,eat,paw,fidget,settings);
