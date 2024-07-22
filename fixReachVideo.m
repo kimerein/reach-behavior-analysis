@@ -38,6 +38,7 @@ endofDir=regexp(videoFile,sep);
 % Variables to adjust:
 discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
 chewThresh=0.9; % default is 1
+vars.subtractExternalCue=true; % if external cue is lighting up whole field of view
 
 if chewThresh~=1
     qans=questdlg('Chewing threshold is usually 1. Are you sure you want to proceed with a different value for chewThresh?');
@@ -158,7 +159,7 @@ analyzeReachVideo_wrapper('getAlignment',vars);
 % STEP 2), run this
 
 % Variables to adjust:
-minProm=100000; % minimum height of "cue" signal in movie
+minProm=20000; % minimum height of "cue" signal in movie
 
 a=load([videoFile(1:endofVfname(end)-1) '_aligned.mat']);
 aligned2=a.aligned;
@@ -168,6 +169,25 @@ vars.aligned2=aligned2;
 vars.videoFile=videoFile;
 vars.endofVfname=endofVfname;
 
+if vars.subtractExternalCue==true
+    % cue and distractor never on at the same time
+    figure(); plot(aligned2.cueZone,'Color','b');
+    base=input('Cue baseline: ');
+    % Expand movie_distractor by a few inds
+    resampleSlop=100; % in ms
+    resampleSlopInds=ceil((resampleSlop/1000)/0.03);
+    f=aligned2.movie_distractor>0.5;
+    for i=1+resampleSlopInds:length(f)-1-resampleSlopInds
+        if f(i)==0 & f(i+1)==1
+            aligned2.movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
+        elseif f(i)==1 & f(i+1)==0
+            aligned2.movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
+        end
+    end
+    aligned2.cueZone(aligned2.movie_distractor>0.5)=base;
+    vars.aligned2=aligned2;
+end
+    
 analyzeReachVideo_wrapper('getCue',vars);
 
 %% STEP 4 -- Make final organized data structure in folder
@@ -192,6 +212,18 @@ analyzeReachVideo_wrapper('organizeData',vars);
 
 %% STEP 5 -- Run SVM to do final classification of success versus drop
 
+doThisManually=true;
+
 addpath(genpath(chronuxPath));
-fixDropVSuccess([videoFile(1:endofVfname(end)-1) '_processed_data'],videoFile(1:endofVfname(end)-1),[]);
+if doThisManually==true
+    fixDropVSuccess([videoFile(1:endofVfname(end)-1) '_processed_data'],[videoFile(1:endofVfname(end)-1)],[],false);
+else
+    fixDropVSuccess([videoFile(1:endofVfname(end)-1) '_processed_data'],[videoFile(1:endofVfname(end)-1)],[]);
+end
+fid=fopen([videoFile(1:endofVfname(end)-1) '_processed_data\fixed_miss_v_grab.txt'],'wt');
+fclose(fid);
+
+%% RESET PATH
+
 rmpath(genpath(chronuxPath));
+
