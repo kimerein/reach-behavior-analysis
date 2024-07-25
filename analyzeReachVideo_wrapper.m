@@ -46,7 +46,11 @@ switch doFunction
         aligned2=vars.aligned2;
         videoFile=vars.videoFile;
         endofVfname=vars.endofVfname;
-        [aligned,cleanup]=cleanUpCue_basedOnArduino(aligned2,minProm,minProm/2);
+        if vars.subtractExternalCue==true
+            [aligned,cleanup]=cleanUpCue_fillInArduino(aligned2);
+        else
+            [aligned,cleanup]=cleanUpCue_basedOnArduino(aligned2,minProm,minProm/2);
+        end
         save([videoFile(1:endofVfname(end)-1) '_cleanup_settings.mat'], 'cleanup');
         save([videoFile(1:endofVfname(end)-1) '_aligned.mat'],'aligned');
     case 'organizeData'
