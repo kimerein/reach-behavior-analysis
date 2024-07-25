@@ -91,7 +91,7 @@ discardFramesAtEnd=0; % Thow out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.5;
+fractionRange=0.7;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.

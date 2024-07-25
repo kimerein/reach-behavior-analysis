@@ -28,8 +28,10 @@ temp_LED=temp_LED(~isnan(temp_LED));
 % temp_LED=temp_LED-smooth(temp_LED,51)';
 % temp_LED=temp_LED-min(temp_LED);
 % [~,whtorm]=rmoutliers(temp_LED,2,"ThresholdFactor",20);
-whtorm=temp_LED>20*mad(temp_LED,[],2)+median(temp_LED,2) | temp_LED<median(temp_LED,2)-20*mad(temp_LED,[],2);
-temp_LED(whtorm)=prctile(temp_LED,10);
+if settings.doOutlierRemoval==true
+    whtorm=temp_LED>20*mad(temp_LED,[],2)+median(temp_LED,2) | temp_LED<median(temp_LED,2)-20*mad(temp_LED,[],2);
+    temp_LED(whtorm)=prctile(temp_LED,10);
+end
 threshForOnVsOff=min(temp_LED)+settings.fractionRange*range(temp_LED);
 % threshForOnVsOff=nanmean([max(temp_LED) min(temp_LED)])-0.4*(max(temp_LED)-min(temp_LED));
 

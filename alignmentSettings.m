@@ -126,6 +126,9 @@ end
 settings.try_delay1=-600;
 settings.try_delay2=400;
 
+% Remove outliers from LED alignment distractor signal before aligning
+settings.doOutlierRemoval=false; % will do this outlier removal if true
+
 % The movie DVR occasionally skips. For final alignment, code will subtly 
 % shift sub-sections of movie data to better match arduino data 
 % settings.alignSegments=600; % how many indices in each sub-section to independently align
