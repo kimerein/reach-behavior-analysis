@@ -78,6 +78,13 @@ switch doFunction
         save([videoFile(1:endofVfname(end)-1) '_processed_data/tbt.mat'],'tbt');
         settings=plotCueTriggered_settings();
         save([videoFile(1:endofVfname(end)-1) '_plottingSettings.mat'],'settings');
+    case 'fixRampExternalCue'
+        videoFile=vars.videoFile;
+        endofVfname=vars.endofVfname;
+        a=load([videoFile(1:endofVfname(end)-1) '_aligned.mat']);
+        aligned=a.aligned;
+        aligned=fixRampExternalCue(aligned);
+        save([videoFile(1:endofVfname(end)-1) '_aligned.mat'],'aligned');
     otherwise
         error('Unrecognized value of doFunction argument to analyzeReachVideo_wrapper');
 end

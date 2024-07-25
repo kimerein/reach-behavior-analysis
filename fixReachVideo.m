@@ -39,6 +39,7 @@ endofDir=regexp(videoFile,sep);
 discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
 chewThresh=0.9; % default is 1
 vars.subtractExternalCue=true; % if external cue is lighting up whole field of view
+vars.cueWasRamp=true; % if external cue was ramp, need to adjust cueZone_onVoff timing to catch BEGINNING rather than PEAK of ramp
 
 if chewThresh~=1
     qans=questdlg('Chewing threshold is usually 1. Are you sure you want to proceed with a different value for chewThresh?');
@@ -189,6 +190,10 @@ if vars.subtractExternalCue==true
 end
     
 analyzeReachVideo_wrapper('getCue',vars);
+
+if vars.subtractExternalCue==true && vars.cueWasRamp==true
+    analyzeReachVideo_wrapper('fixRampExternalCue',vars);
+end
 
 %% STEP 4 -- Make final organized data structure in folder
 
