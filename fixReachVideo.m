@@ -37,7 +37,7 @@ endofDir=regexp(videoFile,sep);
 
 % Variables to adjust:
 discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
-chewThresh=0.9; % default is 1
+chewThresh=1; % default is 1
 vars.subtractExternalCue=true; % if external cue is lighting up whole field of view
 vars.cueWasRamp=true; % if external cue was ramp, need to adjust cueZone_onVoff timing to catch BEGINNING rather than PEAK of ramp
 
@@ -186,20 +186,22 @@ vars.endofVfname=endofVfname;
 
 if vars.subtractExternalCue==true
     % cue and distractor never on at the same time
+    aligned2.backup_cueZone=aligned2.cueZone;
+    aligned2.temp_movie_distractor=aligned2.movie_distractor;
     figure(); plot(aligned2.cueZone,'Color','b');
     base=input('Cue baseline: ');
     % Expand movie_distractor by a few inds
-    resampleSlop=2000; % in ms
+    resampleSlop=500; % in ms
     resampleSlopInds=ceil((resampleSlop/1000)/0.03);
-    f=aligned2.movie_distractor>0.5;
+    f=aligned2.temp_movie_distractor>0.5;
     for i=1+resampleSlopInds:length(f)-1-resampleSlopInds
         if f(i)==0 & f(i+1)==1
-            aligned2.movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
+            aligned2.temp_movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
         elseif f(i)==1 & f(i+1)==0
-            aligned2.movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
+            aligned2.temp_movie_distractor(i-resampleSlopInds:i+resampleSlopInds)=1;
         end
     end
-    aligned2.cueZone(aligned2.movie_distractor>0.5)=base;
+    aligned2.cueZone(aligned2.temp_movie_distractor>0.5)=base;
     vars.aligned2=aligned2;
 end
     
