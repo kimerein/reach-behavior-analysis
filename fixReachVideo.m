@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240701\X1\O2 output\VID_20150811_173611.avi';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240701\X1\O2 output\VID_20150811_173611_parsedOutput.mat';
 
 %% Set up
 
@@ -191,7 +191,7 @@ if vars.subtractExternalCue==true
     figure(); plot(aligned2.cueZone,'Color','b');
     base=input('Cue baseline: ');
     % Expand movie_distractor by a few inds
-    resampleSlop=500; % in ms
+    resampleSlop=1000; % in ms
     resampleSlopInds=ceil((resampleSlop/1000)/0.03);
     f=aligned2.temp_movie_distractor>0.5;
     for i=1+resampleSlopInds:length(f)-1-resampleSlopInds
