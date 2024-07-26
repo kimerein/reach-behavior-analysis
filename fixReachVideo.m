@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240715\X2\O2 output\VID_20150826_001402.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301.avi';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240715\X2\O2 output\VID_20150826_001402_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301_parsedOutput.mat';
 
 %% Set up
 
@@ -65,6 +65,9 @@ analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
 
 %% STEP 1.5
 % Check whether reach accidentally grabbed distractor
+% Check whether reach accidentally grabbed cue
+% Check whether distractor accidentally grabbed cue (problem for external
+% vis cue)
 
 a=load([videoFile(1:endofVfname(end)-1) '_reaches.mat']);
 reaches=a.reaches;
@@ -77,6 +80,17 @@ hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach
 plot(savehandles.LEDvals-nanmin(savehandles.LEDvals),'Color','b');
 legend({'black: raw reach data','red: classified as reach','blue: distractor'});
 
+figure();
+plot(reaches.rawData-nanmin(reaches.rawData),'Color','k');
+hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach-nanmin(reaches.isReach))).*nanmax(reaches.rawData-nanmin(reaches.rawData)),'Color','r');
+plot(savehandles.cueZone-nanmin(savehandles.cueZone),'Color','b');
+legend({'black: raw reach data','red: classified as reach','blue: cue'});
+
+figure();
+plot(savehandles.LEDvals-nanmin(savehandles.LEDvals),'Color','b');
+hold on;
+plot(savehandles.cueZone-nanmin(savehandles.cueZone),'Color','r');
+legend({'blue: distractor','red: cue'});
 
 figure(); plot(reaches.rawData,'Color','r'); hold on; plot(savehandles.LEDvals,'Color','b');
 hold on; plot(savehandles.pelletPresent,'Color','g');
@@ -175,7 +189,7 @@ if vars.subtractExternalCue==true
     figure(); plot(aligned2.cueZone,'Color','b');
     base=input('Cue baseline: ');
     % Expand movie_distractor by a few inds
-    resampleSlop=100; % in ms
+    resampleSlop=2000; % in ms
     resampleSlopInds=ceil((resampleSlop/1000)/0.03);
     f=aligned2.movie_distractor>0.5;
     for i=1+resampleSlopInds:length(f)-1-resampleSlopInds

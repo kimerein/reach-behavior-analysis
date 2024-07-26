@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240715\X2\O2 output\VID_20150826_001402.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301.avi';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240715\X2\O2 output\VID_20150826_001402_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X5\O2 output\VID_20150807_175301_parsedOutput.mat';
 
 %% Set up
 
@@ -39,6 +39,7 @@ endofDir=regexp(videoFile,sep);
 discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
 chewThresh=0.9; % default is 1
 vars.subtractExternalCue=true; % if external cue is lighting up whole field of view
+vars.cueWasRamp=true; % if external cue was ramp, need to adjust cueZone_onVoff timing to catch BEGINNING rather than PEAK of ramp
 
 if chewThresh~=1
     qans=questdlg('Chewing threshold is usually 1. Are you sure you want to proceed with a different value for chewThresh?');
@@ -64,6 +65,9 @@ analyzeReachVideo_wrapper('extractEventsFromMovie',vars);
 
 %% STEP 1.5
 % Check whether reach accidentally grabbed distractor
+% Check whether reach accidentally grabbed cue
+% Check whether distractor accidentally grabbed cue (problem for external
+% vis cue)
 
 a=load([videoFile(1:endofVfname(end)-1) '_reaches.mat']);
 reaches=a.reaches;
@@ -76,6 +80,14 @@ hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach
 plot(savehandles.LEDvals-nanmin(savehandles.LEDvals),'Color','b');
 legend({'black: raw reach data','red: classified as reach','blue: distractor'});
 
+figure();
+plot(reaches.rawData-nanmin(reaches.rawData),'Color','k');
+hold on; plot(((reaches.isReach-nanmin(reaches.isReach))./nanmax(reaches.isReach-nanmin(reaches.isReach))).*nanmax(reaches.rawData-nanmin(reaches.rawData)),'Color','r');
+plot(savehandles.LEDvals-nanmin(savehandles.cueZone),'Color','b');
+legend({'black: raw reach data','red: classified as reach','blue: cue'});
+
+figure();
+plot()
 
 figure(); plot(reaches.rawData,'Color','r'); hold on; plot(savehandles.LEDvals,'Color','b');
 hold on; plot(savehandles.pelletPresent,'Color','g');
@@ -91,7 +103,7 @@ discardFramesAtEnd=0; % Thow out this many frames at the end of the video
 % Threshold for distinguishing LED distractor on vs off
 % The threshold will be min(LED distractor) + fractionRange*range(LED
 % distractor)
-fractionRange=0.7;
+fractionRange=0.5;
 
 % The following values help the alignment by giving an estimate of when
 % the movie fits into the arduino data.
@@ -189,6 +201,10 @@ if vars.subtractExternalCue==true
 end
     
 analyzeReachVideo_wrapper('getCue',vars);
+
+if vars.subtractExternalCue==true && vars.cueWasRamp==true
+    analyzeReachVideo_wrapper('fixRampExternalCue',vars);
+end
 
 %% STEP 4 -- Make final organized data structure in folder
 
