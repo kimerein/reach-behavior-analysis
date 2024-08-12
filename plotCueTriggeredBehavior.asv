@@ -400,10 +400,6 @@ if settings.useFixedTimeBins==1
             % cut off anything that does not match times
             temp2(isnan(tbt.times(j,:)))=nan;
             useTimesForSeries=tbt.times_wrt_trial_start(j,:);
-            % KR 20240812
-            % make time match indices before resample, Kim changed next
-            % line
-            useTimesForSeries=0:bettermode:(length(useTimesForSeries)-1)*bettermode;
             curr=timeseries(temp2(~isnan(temp2) & ~isnan(useTimesForSeries)),useTimesForSeries(~isnan(temp2) & ~isnan(useTimesForSeries)));
             res_curr=resample(curr,binTimes);
             newTimeTbt_temp(j,1:length(res_curr.data))=res_curr.data;

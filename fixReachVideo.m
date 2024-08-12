@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240701\X1\O2 output\VID_20150811_173611.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X2\O2 output\VID_20150807_190320.avi';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240701\X1\O2 output\VID_20150811_173611_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240627\X2\O2 output\VID_20150807_190320_parsedOutput.mat';
 
 %% Set up
 
