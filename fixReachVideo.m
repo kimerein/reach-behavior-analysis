@@ -8,25 +8,19 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240820\X4\O2 output\2015-03-19 20-32-19-C.avi';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240827\XB1\O2 output\20240827030443_000002.TS';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240820\X4\O2 output\2015-03-19 20-32-19-C_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240827\XB1\O2 output\20240827030443_000002_parsedOutput.mat';
 
 %% Set up
 
 % Set up video-specific variables
-if ispc
-    endofVfname=regexp(videoFile,'AVI');
-    if isempty(endofVfname)
-        endofVfname=regexp(videoFile,'avi');
-    end
-    endofVfname=endofVfname-1;
-else
-    endofVfname=regexp(videoFile,'AVI');
-    if isempty(endofVfname)
-        endofVfname=regexp(videoFile,'avi');
-    end
-    endofVfname=endofVfname-1;
+endofVfname=regexp(videoFile,'\.AVI');
+if isempty(endofVfname)
+    endofVfname=regexp(videoFile,'\.avi');
+end
+if isempty(endofVfname)
+    endofVfname=regexp(videoFile,'\.TS');
 end
 endofDir=regexp(videoFile,sep);
 
