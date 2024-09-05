@@ -8,9 +8,9 @@ function fixReachVideo
 
 clear variables
 
-videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240827\XB1\O2 output\20240827030443_000002.TS';
+videoFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240814\XB1\O2 output\20240813220543_000002.TS';
 chronuxPath='C:\Users\sabatini\Documents\GitHub\chronux_2_11'; % path to Chronux
-parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240827\XB1\O2 output\20240827030443_000002_parsedOutput.mat';
+parsedOutputFile='Z:\MICROSCOPE\Kim\KER Behavior\By date\Low speed\20240814\XB1\O2 output\20240813220543_000002_parsedOutput.mat';
 
 %% Set up
 
@@ -30,7 +30,7 @@ endofDir=regexp(videoFile,sep);
 % If either figure is problematic, run this section
 
 % Variables to adjust:
-discardMoreFramesAtBeginning=0; % Thow out this many more frames at the beginning of the video
+discardMoreFramesAtBeginning=20196; % Thow out this many more frames at the beginning of the video
 chewThresh=1; % default is 1
 vars.subtractExternalCue=true; % if external cue is lighting up whole field of view
 vars.cueWasRamp=true; % if external cue was ramp, need to adjust cueZone_onVoff timing to catch BEGINNING rather than PEAK of ramp
@@ -48,6 +48,9 @@ end
 
 a=load([videoFile(1:endofVfname(end)-1) '_autoReachSettings.mat']);
 settings=a.settings;
+if isempty(settings.discardFirstNFrames)
+    settings.discardFirstNFrames=0;
+end
 settings=autoReachAnalysisSettings(settings.discardFirstNFrames+discardMoreFramesAtBeginning,true,chronuxPath,chewThresh);
 a=load([videoFile(1:endofVfname(end)-1) '_zoneVals.mat']);
 zoneVals=a.zoneVals;
@@ -91,6 +94,14 @@ hold on; plot(savehandles.pelletPresent,'Color','g');
 hold on; plot(savehandles.pelletPresent*8e5,'Color','g');
 hold on; plot(savehandles.optoZone,'Color','k');
 hold on; plot(savehandles.cueZone,'Color','m');
+
+%% STEP 1.9 Get Arduino output data if parsedOutput.mat does not yet exist
+if ~exist([videoFile(1:endofVfname(end)-1) '_parsedOutput.mat'],"file")
+    out=parseSerialOut_wrapper([videoFile(1:endofVfname(end)-1) '_OUTPUT.txt'],[videoFile(1:endofVfname(end)-1) '_parsedOutput.mat']);
+    settings=arduinoSettings();
+    save([videoFile(1:endofVfname(end)-1) '_arduinoSettings.mat'],'settings');
+end
+
 %% STEP 2 -- Alignment of Arduino and Movie
 % If there are problems with the alignment (or if you've re-run STEP 1), run this
 

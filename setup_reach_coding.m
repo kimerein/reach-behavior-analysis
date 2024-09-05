@@ -19,6 +19,10 @@ settings=setup_reach_coding_settings();
 filename=varargin{1};
 discardFirstNFrames=varargin{2};
 
+if isempty(discardFirstNFrames)
+    error('Second argument discardFirstNFrames should be an integer');
+end
+
 % Instructions to user
 continuebutton=questdlg(settings.prompt1,'Instructions 1','Yes','Cancel','Cancel');
 switch continuebutton
